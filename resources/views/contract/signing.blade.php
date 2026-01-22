@@ -1,0 +1,44 @@
+@extends('layouts.master')
+
+@section('content')
+<style>
+    #pandadoc-container {
+        width: 100%;
+    }
+</style>
+<section class="max-w-7xl mx-auto py-8 px-4 sm:px-6">
+
+    {{-- Header with Navigation & Status --}}
+    <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 leading-tight">Contract Review & Signing</h1>
+            <p class="text-sm text-gray-500">Please review the details for <span class="font-semibold text-gray-700">{{ $lead->name }} {{ $lead->surname }}</span></p>
+        </div>
+    </div>
+
+    {{-- Main Container --}}
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden relative">
+
+        {{-- Loading Overlay --}}
+        <div id="loader" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50/90 z-20 backdrop-blur-sm transition-opacity duration-500">
+            <div class="relative">
+                <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+            </div>
+            <p class="mt-4 text-gray-600 font-semibold animate-pulse">Initializing Secure Document...</p>
+        </div>
+
+        {{-- PandaDoc Iframe Target --}}
+        <div id="pandadoc-container" class="w-full min-h-[800px] bg-gray-50">
+            {{-- The SDK will inject the iframe here --}}
+        </div>
+    </div>
+</section>
+
+<script>
+    window.signingConfig = {
+        sessionId: "{{ $sessionId }}",
+        redirectUrl: "{{ route('dashboard.index', ['status' => 'signed']) }}"
+    };
+</script>
+@vite(['resources/js/signing.js'])
+@endsection
