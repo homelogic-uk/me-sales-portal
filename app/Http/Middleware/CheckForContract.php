@@ -18,7 +18,7 @@ class CheckForContract
     public function handle(Request $request, Closure $next): Response
     {
 
-        $excludedRoutes = ['leads.contract.generate', 'leads.contract.signing', 'leads.contract.complete'];
+        $excludedRoutes = ['leads.contract.generate', 'leads.contract.signing', 'leads.contract.complete', 'leads.contract.status'];
 
         $route = $request->route();
 
