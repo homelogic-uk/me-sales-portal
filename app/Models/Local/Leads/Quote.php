@@ -3,6 +3,7 @@
 namespace App\Models\Local\Leads;
 
 use App\Models\CRM\Lead;
+use App\Models\Local\Leads\Discount;
 use App\Models\Local\Products\Product;
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,40 +25,46 @@ class Quote extends Model
         return $this->hasOne(Lead::class, 'id', 'id');
     }
 
+    public function discounts()
+    {
+        return $this->hasMany(Discount::class, 'quote_id');
+    }
+
+    public function extras()
+    {
+        return json_decode($this->extras);
+    }
+
     public function buildPricingTable()
     {
         $lineItems = [];
 
+        // 1. Cleanly join extra names using a collection
+        $extrasString = collect($this->extras())->pluck('name')->implode(', ');
+
+        // 2. Calculate final price (ensure it doesn't go below 0)
+        $discountedPrice = max(0, $this->total_price - $this->discounts->sum('amount'));
+
         switch ($this->product_id) {
-            case 1: {
-                    $lineItems[] = [
-                        'options' => ['optional' => false, 'optional_selected' => false, 'qty_editable' => false],
-                        'data' => [
-                            'name' => 'Insulation Installation',
-                            'description' => 'Installation of new insulation and removal & disposal of existing insulation.',
-                            'price' => ($this->total_price ?: 0),
-                            'qty' => 1,
-                        ],
-                    ];
+            case 1:
+                $lineItems[] = [
+                    'options' => [
+                        'optional' => false,
+                        'optional_selected' => false,
+                        'qty_editable' => false
+                    ],
+                    'data' => [
+                        'name' => 'Insulation Installation',
+                        'description' => 'Installation of new insulation and removal & disposal of existing insulation.' .
+                            ($extrasString ? PHP_EOL . PHP_EOL . 'This includes: ' . $extrasString : ''),
+                        'price' => $discountedPrice,
+                        'qty' => 1,
+                    ],
+                ];
+                break;
 
-                    break;
-                }
+                // You can add more cases here as your product line expands
         }
-
-        // foreach (json_decode($this->extras) as $extra) {
-        //     $lineItems[] = [
-        //         'options' => ['optional' => false, 'optional_selected' => false, 'qty_editable' => false],
-        //         'data' => [
-        //             'name' => $extra->name,
-        //             'description' => '',
-        //             'price' => $extra->price / $extra->amount,
-        //             'qty' => intval($extra->amount),
-        //         ],
-        //     ];
-        // }
-
-        // // dd(json_encode($lineItems));
-        // dd($lineItems);
 
         return $lineItems;
     }

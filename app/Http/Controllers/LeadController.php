@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\CRM\Lead;
 use App\Models\Local\Products\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LeadController extends Controller
 {
     public function view(Request $request, $id)
     {
-        $lead = Lead::where('id', $id)->first();
+        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
 
         if (!$lead)
             abort(404);
@@ -21,7 +22,7 @@ class LeadController extends Controller
         if ($request->isMethod('POST')) {
             $product = $request->product;
 
-            if(!Product::where('enabled', 'Y')->where('id', $product)->count())
+            if (!Product::where('enabled', 'Y')->where('id', $product)->count())
                 abort(404);
 
             return redirect()->route('leads.quote.create', ['id' => $id, 'product' => $product]);

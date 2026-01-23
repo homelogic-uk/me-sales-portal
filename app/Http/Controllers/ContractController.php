@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CustomerWelcomeMail;
 use App\Models\CRM\Lead;
 use App\Models\Local\Leads\Document;
 use App\Services\SigningService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ContractController extends Controller
 {
     public function details(Request $request, SigningService $signingService, $id)
     {
-        $lead = Lead::findOrFail($id);
+        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
 
         if ($request->isMethod('put')) {
             // 1. Validation Logic
@@ -143,7 +148,7 @@ class ContractController extends Controller
 
     public function generate(Request $request, $id, $documentId)
     {
-        $lead = Lead::findOrFail($id);
+        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
         $document = Document::where('lead_id', $id)
             ->where('uuid', $documentId)
             ->first();
@@ -161,7 +166,7 @@ class ContractController extends Controller
             ->where('uuid', $documentId)
             ->firstOrFail();
 
-        $lead = Lead::where('id', $id)->firstOrFail();
+        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
 
         // 2. Fetch the status from the service
         $response = $signingService->getDocumentStatus($document->document_id);
@@ -193,14 +198,13 @@ class ContractController extends Controller
 
     public function signing(Request $request, SigningService $signingService, $id, $documentId)
     {
-
         // 1. Use a more concise query or route model binding
         $document = Document::where('lead_id', $id)
             ->where('status', 'document.sent')
             ->where('uuid', $documentId)
             ->firstOrFail();
 
-        $lead = Lead::where('id', $id)->firstOrFail();
+        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
 
         $sessionId = null;
         $cacheKey = $id . '_signing_session_' . $documentId;
@@ -213,6 +217,32 @@ class ContractController extends Controller
         }
 
         return view('contract.signing', compact('lead', 'document', 'sessionId'));
+    }
+
+    public function complete(Request $request, SigningService $signingService, $id, $documentId)
+    {
+        // 1. Use a more concise query or route model binding
+        $document = Document::where('lead_id', $id)
+            ->where('status', 'document.sent')
+            ->where('uuid', $documentId)
+            ->firstOrFail();
+
+        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+
+        if ($document->status == 'document.completed')
+            abort(404);
+
+        $document->update(['status' => 'document.completed']);
+
+        $fileName = Str::uuid() . '.pdf';
+
+        if (Storage::disk('local')->put($fileName, $signingService->downloadDocument($document->document_id))) {
+            Mail::to($lead->email)
+                ->bcc('info@logicfoam.com')
+                ->send(new CustomerWelcomeMail(strtolower(ucwords($lead->name . ' ' . $lead->surname)), $fileName));
+        }
+
+        return view('contract.complete', compact('lead'));
     }
 
     /**

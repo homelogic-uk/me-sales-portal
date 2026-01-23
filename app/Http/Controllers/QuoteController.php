@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\CRM\Lead;
+use App\Models\Local\Leads\Discount;
 use App\Models\Local\Leads\Quote;
 use App\Models\Local\Products\Option;
 use App\Models\Local\Products\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\Console\Helper\QuestionHelper;
 
 class QuoteController extends Controller
 {
     public function create(Request $request, $id, $product)
     {
-        $lead = Lead::where('id', $id)->first();
+        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
 
         if (!$lead)
             abort(404);
@@ -74,7 +76,7 @@ class QuoteController extends Controller
 
     public function view(Request $request, $id)
     {
-        $lead = Lead::where('id', $id)->first();
+        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
 
         if (!$lead)
             abort(404);
@@ -86,6 +88,7 @@ class QuoteController extends Controller
             $quoteId = $request->delete_quote;
 
             if ($quoteId) {
+                $lead->quotes()->where('id', $quoteId)->first()?->discounts()->delete();
                 $lead->quotes()->where('id', $quoteId)->delete();
             }
 
@@ -93,5 +96,43 @@ class QuoteController extends Controller
         }
 
         return view('quote.view', compact('lead'));
+    }
+
+    public function addDiscount(Request $request, $id)
+    {
+        // 1. Use relationship chaining to ensure the quote belongs to the authorized user's lead
+        $quote = Auth::user()->leads()->findOrFail($id)
+            ->quotes()->findOrFail($request->quote_id);
+
+        // 2. Validate input properly
+        $request->validate([
+            'discount_amount' => 'required|numeric|min:0.01'
+        ]);
+
+        $newTotalDiscount = $quote->discounts()->sum('amount') + $request->discount_amount;
+
+        // 3. Guard clause for business logic
+        if ($newTotalDiscount > $quote->total_price) {
+            return back()->withErrors(['error' => 'Total discount cannot exceed the quote price.']);
+        }
+
+        // 4. Create record via relationship
+        $quote->discounts()->create([
+            'user_id' => Auth::id(),
+            'amount'  => $request->discount_amount,
+        ]);
+
+        return back()->with('success', 'Discount applied.');
+    }
+
+    public function removeDiscount(Request $request, $id)
+    {
+        // Ensure the user owns the lead/quote before deleting
+        $quote = Auth::user()->leads()->findOrFail($id)
+            ->quotes()->findOrFail($request->quote_id);
+
+        $quote->discounts()->delete();
+
+        return back()->with('success', 'Discounts removed.');
     }
 }

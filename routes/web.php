@@ -20,6 +20,8 @@ Route::middleware('auth')->prefix('view/{id}')->name('leads.')->group(function (
     // Quotes
     Route::prefix('quote')->name('quote.')->group(function () {
         Route::match(['GET', 'POST', 'DELETE'], '/', [QuoteController::class, 'view'])->name('view');
+        Route::match(['POST'], '/discount/apply', [QuoteController::class, 'addDiscount'])->name('addDiscount');
+        Route::match(['DELETE'], '/discount/delete', [QuoteController::class, 'removeDiscount'])->name('removeDiscount');
         Route::match(['GET', 'POST'], '/{product}', [QuoteController::class, 'create'])->name('create');
     });
 
@@ -28,6 +30,7 @@ Route::middleware('auth')->prefix('view/{id}')->name('leads.')->group(function (
         Route::match(['GET', 'PUT'], '/', [ContractController::class, 'details'])->name('details');
         Route::match(['GET', 'PUT'], '/generate/{uuid}', [ContractController::class, 'generate'])->name('generate');
         Route::match(['GET', 'PUT'], '/signing/{uuid}', [ContractController::class, 'signing'])->name('signing');
+        Route::match(['GET', 'PUT'], '/{uuid}/complete', [ContractController::class, 'complete'])->name('complete');
 
         Route::get('status/{uuid}', [ContractController::class, 'status'])->name('status');
     });

@@ -3,11 +3,15 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\Response;
 
 class SigningService
 {
     protected string $baseUrl = 'https://api.pandadoc.com/public/v1';
 
+    /**
+     * Common headers for PandaDoc API requests.
+     */
     protected function getHeaders(): array
     {
         return [
@@ -18,26 +22,19 @@ class SigningService
 
     /**
      * Get the current status and details of a document.
-     * * @param string $documentId The UUID of the document
-     * @return array
      */
     public function getDocumentStatus(string $documentId): array
     {
         $response = Http::withHeaders($this->getHeaders())
             ->get("{$this->baseUrl}/documents/{$documentId}");
 
-        if ($response->failed()) {
-            return [
-                'success' => false,
-                'status'  => $response->status(),
-                'error'   => $response->json('get.error') ?? 'Failed to fetch status',
-            ];
-        }
-
-        return $response->json();
+        return $this->handleResponse($response);
     }
 
-    public function createDocument($documentData)
+    /**
+     * Create a document from a template.
+     */
+    public function createDocument(array $documentData): array
     {
         $response = Http::withHeaders($this->getHeaders())
             ->post("{$this->baseUrl}/documents", [
@@ -50,10 +47,13 @@ class SigningService
                 'metadata'       => (object)($documentData['metadata'] ?? []),
             ]);
 
-        return $response->json();
+        return $this->handleResponse($response);
     }
 
-    public function sendDocument(string $documentId, string $subject = '', string $message = '', bool $silent = false)
+    /**
+     * Send the created document to recipients.
+     */
+    public function sendDocument(string $documentId, string $subject = '', string $message = '', bool $silent = false): array
     {
         $response = Http::withHeaders($this->getHeaders())
             ->post("{$this->baseUrl}/documents/{$documentId}/send", [
@@ -62,26 +62,13 @@ class SigningService
                 'silent'  => $silent,
             ]);
 
-        // dd($response->json());
-
-        if ($response->failed()) {
-            return [
-                'success' => false,
-                'status'  => $response->status(),
-                'message' => $response->body(),
-            ];
-        }
-
-        return $response->json();
+        return $this->handleResponse($response);
     }
 
     /**
      * Creates a signing session for a specific recipient.
-     * * @param string $documentId The PandaDoc document UUID
-     * @param string $recipientEmail The email of the recipient who will sign
-     * @param int $lifetime Session lifetime in seconds (default 3600)
      */
-    public function createSession(string $documentId, string $recipientEmail, int $lifetime = 3600)
+    public function createSession(string $documentId, string $recipientEmail, int $lifetime = 3600): ?array
     {
         $response = Http::withHeaders($this->getHeaders())
             ->post("{$this->baseUrl}/documents/{$documentId}/session", [
@@ -89,11 +76,38 @@ class SigningService
                 'lifetime'  => $lifetime,
             ]);
 
+        return $response->successful() ? $response->json() : null;
+    }
+
+    /**
+     * Download the completed document PDF.
+     * Note: Document must be in "document.completed" status.
+     */
+    public function downloadDocument(string $documentId)
+    {
+        $response = Http::withHeaders($this->getHeaders())
+            ->get("{$this->baseUrl}/documents/{$documentId}/download");
+
         if ($response->failed()) {
             return null;
         }
 
-        // This returns an object containing 'id' and 'session_view_url'
-        return $response->json();
+        return $response->body(); // Returns the raw PDF binary
+    }
+
+    /**
+     * Internal helper to standardize response formatting.
+     */
+    protected function handleResponse(Response $response): array
+    {
+        if ($response->failed()) {
+            return [
+                'success' => false,
+                'status'  => $response->status(),
+                'error'   => $response->json('detail') ?? $response->json('message') ?? 'API Request Failed',
+            ];
+        }
+
+        return array_merge(['success' => true], $response->json() ?? []);
     }
 }

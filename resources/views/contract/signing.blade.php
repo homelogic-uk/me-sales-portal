@@ -37,8 +37,17 @@
 <script>
     window.signingConfig = {
         sessionId: "{{ $sessionId }}",
-        redirectUrl: "{{ route('dashboard.index', ['status' => 'signed']) }}"
+        redirectUrl: "{{ route('leads.contract.complete', ['id' => $lead->id, 'uuid' => $document->uuid ]) }}"
     };
 </script>
+{{-- Full Page Redirect Loader --}}
+<div id="redirect-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white/90 backdrop-blur-md hidden">
+    <div class="flex flex-col items-center">
+        {{-- Success Checkmark or Spinner --}}
+        <div class="w-16 h-16 border-4 border-green-100 border-t-green-600 rounded-full animate-spin"></div>
+        <h2 class="mt-6 text-2xl font-bold text-gray-900">Document Signed!</h2>
+        <p class="mt-2 text-gray-600">Please wait while we finalize your records...</p>
+    </div>
+</div>
 @vite(['resources/js/signing.js'])
 @endsection
