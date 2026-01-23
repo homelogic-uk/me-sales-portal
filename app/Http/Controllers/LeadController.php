@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CRM\Lead;
+use App\Models\Local\Leads\Document;
 use App\Models\Local\Products\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +21,7 @@ class LeadController extends Controller
         $products = Product::where('enabled', 'Y')
             ->get();
 
-        if ($liveSigningDocument = $lead->documents->where('status', '!=', 'document.completed')->first()) {
+        if ($liveSigningDocument = Document::where('lead_id', $id)->where('status', '!=', 'document.completed')->first()) {
             return redirect()->route('lead.contract.generate', ['id' => $lead->id, 'uuid' => $liveSigningDocument->uuid]);
         }
 
