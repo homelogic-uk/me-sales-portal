@@ -9,6 +9,8 @@ use App\Models\CRM\Lead;
 
 class Document extends Model
 {
+    protected $connection = 'mysql';
+
     protected $table = 'lead_documents';
 
     /**
