@@ -12,7 +12,7 @@ Route::match(['GET', 'POST'], 'login', [LoginController::class, 'login'])->name(
 Route::middleware('auth')->get('/', [DashboardController::class, 'index'])->name('dashboard.index');
 
 // Leads, Quotes, and Contracts grouped by lead ID
-Route::middleware('auth')->prefix('view/{id}')->name('leads.')->group(function () {
+Route::middleware(['auth', 'check.for.contract'])->prefix('view/{id}')->name('leads.')->group(function () {
 
     // Lead view
     Route::match(['GET', 'POST'], '/', [LeadController::class, 'view'])->name('view');
