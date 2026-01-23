@@ -11,6 +11,7 @@ class LeadController extends Controller
 {
     public function view(Request $request, $id)
     {
+        $liveSigningDocument = null;
         $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
 
         if (!$lead)
@@ -18,6 +19,10 @@ class LeadController extends Controller
 
         $products = Product::where('enabled', 'Y')
             ->get();
+
+        if ($liveSigningDocument = $lead->documents->where('status', '!=', 'document.completed')->first()) {
+            return redirect()->route('lead.contract.generate', ['id' => $lead->id, 'uuid' => $liveSigningDocument->uuid]);
+        }
 
         if ($request->isMethod('POST')) {
             $product = $request->product;

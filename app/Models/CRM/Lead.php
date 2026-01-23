@@ -2,6 +2,7 @@
 
 namespace App\Models\CRM;
 
+use App\Models\Local\Leads\Document;
 use App\Models\Local\Leads\Quote;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,6 +16,11 @@ class Lead extends Model
     public function quotes()
     {
         return $this->hasMany(Quote::class, 'lead_id', 'id');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class, 'lead_id');
     }
 
     /**
