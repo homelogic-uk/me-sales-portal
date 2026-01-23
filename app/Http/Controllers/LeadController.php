@@ -31,7 +31,7 @@ class LeadController extends Controller
             if (!Product::where('enabled', 'Y')->where('id', $product)->count())
                 abort(404);
 
-            return redirect()->route('leads.quote.create', ['id' => $id, 'product' => $product]);
+            return redirect()->route('lead.quote.create', ['id' => $id, 'product' => $product]);
         }
 
         return view('leads.view', compact('lead', 'products'));
