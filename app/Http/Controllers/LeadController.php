@@ -22,7 +22,7 @@ class LeadController extends Controller
             ->get();
 
         if ($liveSigningDocument = Document::where('lead_id', $id)->where('status', '!=', 'document.completed')->first()) {
-            return redirect()->route('lead.contract.generate', ['id' => $lead->id, 'uuid' => $liveSigningDocument->uuid]);
+            return redirect()->route('leads.contract.generate', ['id' => $lead->id, 'uuid' => $liveSigningDocument->uuid]);
         }
 
         if ($request->isMethod('POST')) {
@@ -31,7 +31,7 @@ class LeadController extends Controller
             if (!Product::where('enabled', 'Y')->where('id', $product)->count())
                 abort(404);
 
-            return redirect()->route('lead.quote.create', ['id' => $id, 'product' => $product]);
+            return redirect()->route('leads.quote.create', ['id' => $id, 'product' => $product]);
         }
 
         return view('leads.view', compact('lead', 'products'));
