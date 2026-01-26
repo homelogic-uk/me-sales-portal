@@ -80,6 +80,22 @@ class Quote extends Model
                 ];
                 break;
 
+            default:
+                $lineItems[] = [
+                    'options' => [
+                        'optional' => false,
+                        'optional_selected' => false,
+                        'qty_editable' => false
+                    ],
+                    'data' => [
+                        'name' => $this->product->name,
+                        'description' => 'Installation of new ' . $this->product->name . ($extrasString ? PHP_EOL . PHP_EOL . 'This includes: ' . $extrasString : ''),
+                        'price' => $discountedPrice,
+                        'qty' => 1,
+                    ],
+                ];
+                break;
+
                 // You can add more cases here as your product line expands
         }
 
