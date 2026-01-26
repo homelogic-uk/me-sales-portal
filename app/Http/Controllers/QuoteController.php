@@ -39,15 +39,19 @@ class QuoteController extends Controller
                 $optionPrice = 0;
 
                 if ($option) {
-                    $amount = 1;
 
                     if (in_array($option->type, ['RANGE', 'NUMBER'])) {
                         $optionPrice = $value * $option->base_cost;
                         $amount = $value;
                     }
 
-                    if ($option->type == 'CHECKBOX')
+                    if ($option->type == 'CHECKBOX') {
                         $optionPrice = $option->base_cost;
+                        $amount = 1;
+                    }
+
+                    if (!$amount)
+                        continue;
 
                     if ($option->name != 'Meterage') {
                         $extras[] = [
