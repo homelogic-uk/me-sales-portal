@@ -63,6 +63,23 @@ class Quote extends Model
                 ];
                 break;
 
+            case 2:
+                $lineItems[] = [
+                    'options' => [
+                        'optional' => false,
+                        'optional_selected' => false,
+                        'qty_editable' => false
+                    ],
+                    'data' => [
+                        'name' => 'Foil Installation',
+                        'description' => 'Installation of new foil insulation.' .
+                            ($extrasString ? PHP_EOL . PHP_EOL . 'This includes: ' . $extrasString : ''),
+                        'price' => $discountedPrice,
+                        'qty' => 1,
+                    ],
+                ];
+                break;
+
                 // You can add more cases here as your product line expands
         }
 

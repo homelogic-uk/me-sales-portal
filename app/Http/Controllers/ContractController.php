@@ -56,6 +56,7 @@ class ContractController extends Controller
             $lead->email = $request->email;
 
             $quote = $lead->quotes->first();
+            
             if (!$quote) abort(404);
 
             $lineItems = $quote->buildPricingTable();
