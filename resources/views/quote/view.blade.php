@@ -93,27 +93,38 @@
                         <div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-blue-500"></div>
 
                         <div class="flex-1 ml-4">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-semibold text-gray-900">{{ $quote->product->name }}</h3>
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900">{{ $quote->product->name }}</h3>
+                                    <span class="text-xs text-gray-400">{{ $quote->created_at->format('d M Y H:i') }}</span>
+                                </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-sm text-gray-500">{{ $quote->created_at->format('d M Y H:i:s') }}</span>
-
-                                    {{-- Discount Action --}}
+                                    {{-- STATIC HIGH-CONTRAST BUTTON --}}
+                                    @if(!($quote->discounts->sum('amount') > 0))
                                     <button type="button"
                                         @click="discountModalOpen = true; activeQuoteId = {{ $quote->id }}; activeQuotePrice = {{ $quote->total_price }}"
-                                        class="bg-amber-500 hover:bg-amber-600 text-white p-2 rounded-full shadow-sm flex items-center justify-center transition-colors"
+                                        class="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg shadow-sm transition-colors focus:outline-none"
                                         title="Apply Discount">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
+                                        ADD DISCOUNT
                                     </button>
+                                    @else
+                                    <button type="button"
+                                        @click="discountModalOpen = true; activeQuoteId = {{ $quote->id }}; activeQuotePrice = {{ $quote->total_price }}"
+                                        class="inline-flex items-center px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold rounded-md border border-gray-300 transition-colors">
+                                        Edit Discount
+                                    </button>
+                                    @endif
 
                                     {{-- Delete button --}}
                                     <form action="" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" name="delete_quote" value="{{ $quote->id }}"
-                                            class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-sm flex items-center justify-center transition-colors">
+                                            class="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-lg transition-colors"
+                                            onclick="return confirm('Are you sure you want to delete this quote?')">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
@@ -124,31 +135,33 @@
 
                             <div class="flex flex-wrap gap-2 mb-4">
                                 @foreach (json_decode($quote->extras) as $extra)
-                                <span class="bg-blue-50 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
+                                <span class="bg-blue-50 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full border border-blue-100">
                                     {{ $extra->name }}
                                 </span>
                                 @endforeach
                             </div>
 
-                            <hr class="border-gray-200 mb-4">
+                            <hr class="border-gray-100 mb-4">
 
                             {{-- Pricing Breakdown --}}
-                            <div class="space-y-1">
+                            <div class="space-y-1 bg-gray-50 p-3 rounded-lg border border-gray-100">
                                 @if($quote->discounts->sum('amount') > 0)
                                 <div class="flex justify-between items-center text-sm text-gray-500">
                                     <span>Subtotal</span>
                                     <span>£{{ number_format($quote->total_price, 2) }}</span>
                                 </div>
-                                <div class="flex justify-between items-center text-sm text-red-600 font-medium group">
+                                <div class="flex justify-between items-center text-sm text-red-600 font-semibold">
                                     <div class="flex items-center">
-                                        <span>Discount Applied</span>
-                                        {{-- Remove Discount Form --}}
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                        </svg>
+                                        <span>Discount</span>
                                         <form action="{{ route('leads.quote.removeDiscount', ['id' => $lead->id]) }}" method="POST" class="ml-2">
                                             @csrf
                                             @method('DELETE')
                                             <input type="hidden" name="quote_id" value="{{ $quote->id }}">
-                                            <button type="submit" name="remove_discount" value="1" class="text-xs text-red-400 hover:text-red-800 underline decoration-dotted">
-                                                (Remove)
+                                            <button type="submit" class="text-[10px] text-red-400 hover:text-red-700 underline uppercase font-bold tracking-tight">
+                                                Remove
                                             </button>
                                         </form>
                                     </div>
@@ -156,20 +169,22 @@
                                 </div>
                                 @endif
 
-                                <div class="flex justify-between items-center font-bold text-gray-900 text-lg pt-1">
-                                    <span>Total</span>
+                                <div class="flex justify-between items-center font-bold text-gray-900 text-xl pt-1">
+                                    <span>Total Price</span>
                                     <div class="text-right">
                                         @if($quote->discounts->sum('amount') > 0)
                                         <span class="text-xs text-gray-400 line-through block font-normal">£{{ number_format($quote->total_price, 2) }}</span>
                                         @endif
-                                        <span>£{{ number_format($quote->total_price - ($quote->discounts->sum('amount') ?? 0), 2) }}</span>
+                                        <span class="text-blue-600">£{{ number_format($quote->total_price - ($quote->discounts->sum('amount') ?? 0), 2) }}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     @empty
-                    <p class="text-gray-500 text-sm">No quotes available yet.</p>
+                    <div class="text-center py-12">
+                        <p class="text-gray-500 text-sm italic">No quotes available yet.</p>
+                    </div>
                     @endforelse
 
                     {{-- Bottom UI Elements --}}
@@ -177,18 +192,18 @@
                     <div class="flex justify-end">
                         @if($lead->quotes->count() === 1)
                         <a href="{{ route('leads.contract.details', ['id' => $lead->id]) }}"
-                            class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 px-6 rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3 px-8 rounded-lg shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:-translate-y-0.5">
                             <span class="mr-2">Continue to Contract</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width:16px; height:16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
                         </a>
                         @else
-                        <div class="flex items-center p-4 text-amber-800 border border-amber-200 rounded-lg bg-amber-50 w-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width:20px; height:20px; margin-right:12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <div class="flex items-center p-4 text-amber-800 border border-amber-200 rounded-lg bg-amber-50 w-full shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
-                            <span class="text-xs">You can only start a contract for one product at a time.</span>
+                            <span class="text-xs font-semibold uppercase tracking-tight">You can only start a contract for one product at a time.</span>
                         </div>
                         @endif
                     </div>
@@ -199,35 +214,53 @@
 
     {{-- Discount Modal --}}
     <div x-show="discountModalOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900 bg-opacity-50"
-        x-cloak>
-        <div class="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden" @click.away="discountModalOpen = false">
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+        x-cloak
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100">
+
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all"
+            @click.away="discountModalOpen = false"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100">
+
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <h3 class="text-lg font-bold text-gray-900">Apply Discount</h3>
-                <button @click="discountModalOpen = false" class="text-gray-400 hover:text-gray-600">
+                <button @click="discountModalOpen = false" class="text-gray-400 hover:text-gray-600 p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
+
             <form action="{{ route('leads.quote.addDiscount', ['id' => $lead->id]) }}" method="POST" class="p-6">
                 @csrf
                 <input type="hidden" name="quote_id" :value="activeQuoteId">
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Original Total: £<span x-text="activeQuotePrice.toFixed(2)"></span></label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-2.5 text-gray-500 font-medium">£</span>
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Current Total: <span class="text-gray-900 font-bold">£<span x-text="activeQuotePrice.toFixed(2)"></span></span>
+                    </label>
+                    <div class="relative group">
+                        <span class="absolute left-4 top-3 text-gray-500 font-bold">£</span>
                         <input type="number" step="0.01" name="discount_amount" required autofocus
-                            class="block w-full pl-7 pr-4 py-2 border {{ $errors->has('discount_amount') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                            class="block w-full pl-8 pr-4 py-3 text-lg border {{ $errors->has('discount_amount') ? 'border-red-500' : 'border-gray-200' }} rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
                             placeholder="0.00" value="{{ old('discount_amount') }}">
                     </div>
+                    <p class="mt-2 text-[11px] text-gray-500">Enter the amount to deduct from the total price.</p>
                     @error('discount_amount')
                     <p class="mt-2 text-xs text-red-600 font-medium italic">{{ $message }}</p>
                     @enderror
                 </div>
-                <div class="flex justify-end gap-3">
-                    <button type="button" @click="discountModalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
-                    <button type="submit" name="apply_discount" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm">Apply Discount</button>
+
+                <div class="flex flex-col gap-3">
+                    <button type="submit" name="apply_discount" class="w-full py-3 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-md transition-all">
+                        Confirm Discount
+                    </button>
+                    <button type="button" @click="discountModalOpen = false" class="w-full py-3 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
                 </div>
             </form>
         </div>
