@@ -200,7 +200,7 @@ class ContractController extends Controller
     {
         // 1. Use a more concise query or route model binding
         $document = Document::where('lead_id', $id)
-            ->where('status', 'document.sent')
+            ->where('status', '!=', 'document.completed')
             ->where('uuid', $documentId)
             ->firstOrFail();
 
@@ -223,7 +223,7 @@ class ContractController extends Controller
     {
         // 1. Use a more concise query or route model binding
         $document = Document::where('lead_id', $id)
-            ->where('status', 'document.sent')
+            ->where('status', '!=', 'document.completed')
             ->where('uuid', $documentId)
             ->firstOrFail();
 
