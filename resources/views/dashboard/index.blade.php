@@ -65,6 +65,11 @@
                                             </div>
                                             @endif
 
+                                            <div class="flex items-center gap-1 text-xs text-gray-500">
+                                                <span class="uppercase tracking-wide">
+                                                    {{ $lead->getProduct->name }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

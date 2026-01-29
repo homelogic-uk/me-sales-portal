@@ -23,6 +23,11 @@ class Lead extends Model
         return $this->hasMany(Document::class, 'lead_id');
     }
 
+    public function getProduct()
+    {
+        return $this->hasOne(Product::class, 'id', 'product');
+    }
+
     /**
      * The attributes that are mass assignable.
      *
