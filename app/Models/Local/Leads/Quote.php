@@ -43,7 +43,7 @@ class Quote extends Model
         $extrasString = collect($this->extras())->pluck('name')->implode(', ');
 
         // 2. Calculate final price (ensure it doesn't go below 0)
-        $discountedPrice = max(0, $this->total_price - $this->discounts->sum('amount'));
+        $discountedPrice = max(0, $this->total_price - $this->discounts->sum('amount') - env('ADMIN_FEE', 250));
 
         switch ($this->product_id) {
             case 1:

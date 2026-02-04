@@ -33,12 +33,16 @@ class QuoteController extends Controller
             $totalPrice = $product->base_price;
 
             $extras = [];
+            $totalQuantity = 0;
 
             foreach ($request->options as $key => $value) {
                 $option = Option::find($key);
                 $optionPrice = 0;
 
                 if ($option) {
+
+                    if ($option->is_quantity == 'Y')
+                        $totalQuantity += $value;
 
                     if (in_array($option->type, ['RANGE', 'NUMBER'])) {
                         $optionPrice = $value * $option->base_cost;
@@ -69,7 +73,8 @@ class QuoteController extends Controller
                 'lead_id' => $lead->id,
                 'product_id' => $product->id,
                 'extras' => json_encode($extras),
-                'total_price' => $totalPrice
+                'total_price' => $totalPrice,
+                'quantity' => $totalQuantity
             ]);
 
             return redirect()->route('leads.quote.view', ['id' => $lead->id]);

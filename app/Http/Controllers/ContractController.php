@@ -56,19 +56,10 @@ class ContractController extends Controller
             $lead->email = $request->email;
 
             $quote = $lead->quotes->first();
-            
+
             if (!$quote) abort(404);
 
             $lineItems = $quote->buildPricingTable();
-
-            // 1. Reduce existing items by admin fee
-            foreach ($lineItems as &$item) {
-                if (isset($item['data']['price'])) {
-                    $item['data']['price'] = max(0, $item['data']['price'] - env('ADMIN_FEE', 250));
-                }
-            }
-
-            unset($item);
 
             $lineItems[] = [
                 'options' => ['optional' => false, 'optional_selected' => false, 'qty_editable' => false],
