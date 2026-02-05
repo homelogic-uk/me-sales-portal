@@ -10,10 +10,19 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        // 1. Define the start date (3 days ago)
+        $startDate = Carbon::today()->subDays(3);
+
+        // 2. Define the end date (Normally +1 day, but if Friday, +3 days to include Monday)
+        $endDate = Carbon::today()->isFriday()
+            ? Carbon::today()->addDays(3)
+            : Carbon::today()->addDay();
+
         $leads = $request->user()
             ->leads()
-            ->orderByRaw('DATE(survey_dt) DESC') // date descending
-            ->orderBy('survey_dt', 'asc')        // time ascending (within date)
+            ->whereBetween('survey_dt', [$startDate, $endDate->endOfDay()]) // Filter the range
+            ->orderByRaw('DATE(survey_dt) DESC')
+            ->orderBy('survey_dt', 'asc')
             ->get()
             ->groupBy(function ($lead) {
                 return $lead->survey_dt->format('Y-m-d');
