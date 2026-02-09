@@ -3,153 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOSTKI | Video Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <title>Spray Foam Removal Certificate</title>
     <style>
-        @page {
-            size: A4 landscape;
-            margin: 0;
+        :root {
+            --mostki-slate: #5A767E;
+            --mostki-bg: #F8F9FA;
         }
-        * {
-            -webkit-print-color-adjust: exact;
-            box-sizing: border-box;
+        .bg-mostki { background-color: var(--mostki-slate); }
+        .text-mostki { color: var(--mostki-slate); }
+        .border-mostki { border-color: var(--mostki-slate); }
+
+        .font-serif-mostki {
+            font-family: 'Georgia', 'Times New Roman', serif;
         }
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            color: #1f2937;
+
+        #meetingSDKElement {
+            width: 100%;
+            height: 100%;
+            background: #1e2527;
+            border-radius: 0.5rem;
         }
-        .a4-landscape {
-            width: 297mm;
-            height: 210mm;
-            margin: 0;
-            padding: 12mm 20mm;
-            position: relative;
-            background: white;
-            display: flex;
-            flex-direction: column;
-        }
-        .header-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4mm;
-            background: #0056b3;
+
+        .modal-overlay {
+            backdrop-filter: blur(12px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
-<body>
+<body class="bg-[#F2F4F5] font-sans overflow-hidden">
 
-    <div class="a4-landscape">
-        <div class="header-bar"></div>
-
-        <div class="flex justify-between items-center mb-8 pt-2">
-            <h1 class="text-4xl font-extrabold tracking-tight text-[#0056b3] uppercase">
-                Spray Foam<br><span class="text-gray-900">Removal Certificate</span>
-            </h1>
-            <img src="https://myenergy.co.uk/wp-content/uploads/2021/06/me-logo.png.webp" alt="MyEnergy" class="h-16">
-        </div>
-
-        <div class="flex-grow">
-            <div class="grid grid-cols-12 gap-10">
-
-                <div class="col-span-5 space-y-8">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <h3 class="text-[10px] font-bold text-[#e11d48] uppercase tracking-widest mb-2">Delivery Address</h3>
-                            <p class="text-sm text-gray-700 leading-snug">
-                                Miss Susan Quinn<br>
-                                9 Cleveland Avenue<br>
-                                High Ercall, TELFORD<br>
-                                TF6 6AH
-                            </p>
-                        </div>
-                        <div>
-                            <h3 class="text-[10px] font-bold text-[#e11d48] uppercase tracking-widest mb-2">Site Address</h3>
-                            <p class="text-sm text-gray-700 leading-snug">
-                                9 Cleveland Avenue<br>
-                                High Ercall, TELFORD<br>
-                                TF6 6AH
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-b border-gray-100 py-4">
-                        <div class="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
-                            <span>Item</span>
-                            <span>Qty</span>
-                        </div>
-                        <div class="flex justify-between text-sm font-semibold text-gray-800">
-                            <span>Removal of Spray Foam Insulation</span>
-                            <span>76</span>
-                        </div>
-                    </div>
-
-                    <div class="pt-2">
-                        <p class="text-[9px] font-bold text-gray-300 uppercase tracking-[0.2em] mb-4">Accreditations</p>
-                        <div class="flex flex-wrap gap-4 grayscale opacity-60">
-                            <div class="h-10 w-14 border border-gray-200 rounded flex flex-col items-center justify-center text-[7px] font-bold">
-                                <span>1</span>
-                            </div>
-                            <div class="h-10 w-14 border border-gray-200 rounded flex flex-col items-center justify-center text-[7px] font-bold">
-                                <span>2</span>
-                            </div>
-                            <div class="h-10 w-24 border border-gray-200 rounded flex flex-col items-center justify-center text-[7px] font-bold">
-                                <span>3</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-7 space-y-6">
-                    <div class="bg-gray-50 rounded-xl p-8 border border-gray-100">
-                        <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6">Schedule of Work</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center border-b border-gray-200 pb-2">
-                                <span class="text-xs font-semibold text-gray-500">Certificate Number:</span>
-                                <span class="text-lg font-bold text-gray-900">SR53820</span>
-                            </div>
-                            <div class="flex justify-between items-center border-b border-gray-200 pb-2">
-                                <span class="text-xs font-semibold text-gray-500">Completion Date:</span>
-                                <span class="text-lg font-bold text-gray-900">14/04/2025</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-semibold text-gray-500">Contractor Name:</span>
-                                <span class="text-lg font-bold text-[#0056b3]">LogicFoam Limited</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 border-l-4 border-[#e11d48] shadow-sm">
-                        <p class="text-sm text-gray-600 leading-relaxed italic">
-                            This certificate is confirmation that the spray foam insulation previously installed in the loft of the mentioned property, has been removed in accordance with current guidance, industry standards as per product certification <span class="text-gray-900 font-bold">BAR-21-195-P-A-UK</span>.
-                        </p>
-                    </div>
-                </div>
+    <div id="nameModal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay bg-slate-900/40">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-md p-10 border-b-4 border-mostki">
+            <div class="text-center mb-8">
+                <h1 class="text-5xl font-serif-mostki tracking-widest text-mostki mb-1">MOSTKI</h1>
+                <p class="text-[10px] tracking-[0.5em] text-mostki/70 uppercase border-t border-mostki/20 pt-2 mx-auto w-fit">
+                    ŻELAZOWA WOLA
+                </p>
             </div>
-        </div>
 
-        <div class="mt-8 pt-6 border-t border-gray-100">
-            <div class="flex justify-between items-end">
-                <div class="space-y-1">
-                    <p class="text-xs font-extrabold text-gray-900">MyEnergy Ltd</p>
-                    <p class="text-[10px] text-gray-500">Tagus House, 9 Ocean Way, Southampton, SO14 3TJ</p>
-                    <p class="text-[9px] text-gray-400 italic font-normal">
-                        MyEnergy is a trading name of LogicFoam Ltd. Registered in England & Wales. Company No: 13172592.
-                    </p>
+            <form id="joinForm" class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Guest Identity</label>
+                    <input
+                        type="text"
+                        id="userName"
+                        required
+                        placeholder="Enter your name"
+                        class="w-full px-4 py-3 rounded border border-slate-200 focus:border-mostki focus:ring-1 focus:ring-mostki outline-none transition-all text-gray-700 bg-slate-50"
+                    >
                 </div>
-
-                <div class="text-right">
-                    <p class="text-lg font-black text-[#0056b3]">0800 1700 680</p>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">www.myenergy.co.uk</p>
-                </div>
-            </div>
+                <button type="submit" class="w-full bg-mostki text-white font-serif-mostki italic text-lg py-4 rounded hover:bg-[#4A6369] transition-colors shadow-md">
+                    Join Portal
+                </button>
+            </form>
         </div>
     </div>
+
+    <header class="bg-white border-b border-slate-200 px-10 py-4 grid grid-cols-3 items-center relative z-10">
+        <div class="flex items-center">
+             <div class="h-2 w-2 rounded-full bg-mostki animate-pulse"></div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center">
+            <h1 class="text-3xl font-serif-mostki tracking-[0.25em] text-mostki leading-none">MOSTKI</h1>
+            <span class="text-[7px] tracking-[0.5em] text-mostki uppercase mt-1">ŻELAZOWA WOLA</span>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-mostki/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div id="systemClock" class="text-xs font-mono font-bold text-slate-500 tracking-widest">00:00:00</div>
+        </div>
+    </header>
+
+    <main class="p-8 h-[calc(100vh-84px)]">
+        <div class="h-full w-full max-w-6xl mx-auto">
+            <div class="bg-white h-full p-3 rounded shadow-xl border border-slate-200">
+                <div id="meetingSDKElement" class="flex items-center justify-center">
+                    <div class="text-center opacity-10">
+                        <h2 class="text-6xl font-serif-mostki tracking-[0.4em] text-white">MOSTKI</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const modal = document.getElementById('nameModal');
+        const joinForm = document.getElementById('joinForm');
+        const clockElement = document.getElementById('systemClock');
+
+        function updateSystemClock() {
+            const now = new Date();
+            clockElement.innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+        }
+        setInterval(updateSystemClock, 1000);
+        updateSystemClock();
+
+        joinForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        });
+    </script>
 
 </body>
 </html>

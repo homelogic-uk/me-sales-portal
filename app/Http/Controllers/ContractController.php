@@ -36,7 +36,6 @@ class ContractController extends Controller
                     'required',
                     'numeric',
                     'min:0',
-                    // Optional: Ensure deposit isn't more than the quote total
                     function ($attribute, $value, $fail) use ($lead) {
                         $total = $lead->quotes->first()?->total_price ?? 0;
                         if ($value > $total) {
@@ -46,17 +45,30 @@ class ContractController extends Controller
                 ],
             ]);
 
-            // Update only modified, non-null, non-empty values
+            // 2. Sanitize and Update Request Data before Fill
+            // Strip non-letters from start and convert to Title Case
+            $cleanName = (string) str(preg_replace('/^[^a-zA-Z]+/', '', $request->name))->lower()->title();
+            $cleanSurname = (string) str(preg_replace('/^[^a-zA-Z]+/', '', $request->surname))->lower()->title();
+
+            // Merge back into the request so fill() picks up the clean versions
+            $request->merge([
+                'name' => $cleanName,
+                'surname' => $cleanSurname,
+            ]);
+
+            // 3. Update Model
+            // Now $request->name and $request->surname are clean
             $lead->fill(array_filter($request->except(['_method', '_token', 'deposit_amount']), fn($v) => filled($v)));
+
+            // Ensure email is explicitly handled if it wasn't caught in the filter
+            $lead->email = $request->email;
 
             if ($lead->isDirty() && !$lead->save()) {
                 return back()->withErrors(['lead' => 'Unable to save lead data.']);
             }
 
-            $lead->email = $request->email;
-
+            // 4. Build Pricing Table
             $quote = $lead->quotes->first();
-
             if (!$quote) abort(404);
 
             $lineItems = $quote->buildPricingTable();
@@ -83,23 +95,24 @@ class ContractController extends Controller
                 ];
             }
 
-            // dd($lineItems);
+            // 5. Signing Service Data
+            $fullName = "{$lead->name} {$lead->surname}";
 
             $fileData = [
                 'template_uuid' => '2WTtXSJnTYTiJFVvXvt2P6',
                 'name' => "MyEnergy - Contract - {$lead->surname}",
                 'recipients' => [[
                     'email' => $lead->email,
-                    'first_name' => str($lead->name)->lower()->title(),
-                    'last_name' => str($lead->surname)->lower()->title(),
+                    'first_name' => $lead->name,
+                    'last_name' => $lead->surname,
                     'role' => 'Client',
                     'signing_order' => 1
                 ]],
                 'fields' => [
-                    "customer_name" => ["value" => (string) str("{$lead->name} {$lead->surname}")->lower()->title()]
+                    "customer_name" => ["value" => $fullName]
                 ],
                 'tokens' => [
-                    ["name" => "clientName", "value" => (string) str("{$lead->name} {$lead->surname}")->lower()->title()],
+                    ["name" => "clientName", "value" => $fullName],
                     ["name" => "clientAddressLine1", "value" => (string) $lead->address_line_1],
                     ["name" => "clientCity", "value" => (string) $lead->city],
                     ["name" => "clientPostcode", "value" => (string) $lead->postcode]
@@ -117,7 +130,6 @@ class ContractController extends Controller
 
             $document = $signingService->createDocument($fileData);
 
-            // Corrected variable name from $result to $document
             if (isset($document['type']) && $document['type'] === 'validation_error') {
                 return back()->withErrors(['api' => 'PandaDoc Error: ' . ($document['detail']['metadata'][0] ?? 'Check field formatting.')])->withInput();
             }
