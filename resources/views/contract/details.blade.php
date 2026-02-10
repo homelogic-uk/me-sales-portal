@@ -3,19 +3,9 @@
 @section('content')
 <style>
     @keyframes shake {
-
-        0%,
-        100% {
-            transform: translateX(0);
-        }
-
-        25% {
-            transform: translateX(-4px);
-        }
-
-        75% {
-            transform: translateX(4px);
-        }
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-4px); }
+        75% { transform: translateX(4px); }
     }
 
     .input-error {
@@ -24,24 +14,23 @@
 </style>
 
 @php
-// [Functions maskEmail, maskPhone, and titleOptions remain same as your snippet]
 function maskEmail($email) {
-if (!$email) return '';
-$parts = explode("@", $email);
-$name = substr($parts[0], 0, 2) . str_repeat('*', max(strlen($parts[0]) - 2, 0));
-return $name . '@' . $parts[1];
+    if (!$email) return '';
+    $parts = explode("@", $email);
+    $name = substr($parts[0], 0, 2) . str_repeat('*', max(strlen($parts[0]) - 2, 0));
+    return $name . '@' . $parts[1];
 }
 
 function maskPhone($phone) {
-if (!$phone) return '';
-$length = strlen($phone);
-if ($length <= 4) return str_repeat('*', $length);
+    if (!$phone) return '';
+    $length = strlen($phone);
+    if ($length <= 4) return str_repeat('*', $length);
     return substr($phone, 0, 2) . str_repeat('*', $length - 4) . substr($phone, -2);
-    }
-    $titleOptions=['Mr', 'Mrs' , 'Miss' , 'Ms' , 'Master' , 'Dr' , 'Prof' , 'Rev' , 'Sir' , 'Lady' , 'Lord' , 'Dame' ];
-    @endphp
+}
+$titleOptions = ['Mr', 'Mrs', 'Miss', 'Ms', 'Master', 'Dr', 'Prof', 'Rev', 'Sir', 'Lady', 'Lord', 'Dame'];
+@endphp
 
-    <section class="max-w-6xl mx-auto py-8 px-4 sm:px-6 overscroll-none">
+<section class="max-w-6xl mx-auto py-8 px-4 sm:px-6 overscroll-none">
 
     {{-- Back Navigation --}}
     <div class="mb-6 flex items-center justify-between">
@@ -56,7 +45,7 @@ if ($length <= 4) return str_repeat('*', $length);
         </span>
     </div>
 
-    {{-- Global Error Alert Refined --}}
+    {{-- Global Error Alert --}}
     @if ($errors->any())
     <div class="mb-8 flex items-center p-4 text-red-800 border border-red-200 rounded-xl bg-red-50 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300" role="alert">
         <div class="flex-shrink-0 bg-red-100 p-2 rounded-lg">
@@ -117,7 +106,7 @@ if ($length <= 4) return str_repeat('*', $length);
 
         {{-- RIGHT COLUMN: Form --}}
         <div class="lg:col-span-2">
-            <form method="POST" id="contractForm" class="space-y-6">
+            <form method="POST" id="contractForm" class="space-y-6" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -214,6 +203,39 @@ if ($length <= 4) return str_repeat('*', $length);
                             </div>
                         </div>
 
+                        {{-- Section 3: Before Photos --}}
+                        <div class="pt-6 border-t border-gray-100">
+                            <div class="mb-4">
+                                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Before Photos</h3>
+                                <p class="text-xs text-gray-400 mt-1">Please upload at least 3 clear photos of the installation area.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                @for ($i = 1; $i <= 3; $i++)
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 tracking-tight">Photo #{{ $i }}</label>
+                                    <div class="relative">
+                                        <input type="file"
+                                                required
+                                               name="before_photos[]"
+                                               accept="image/*"
+                                               class="w-full text-xs text-gray-500
+                                                      file:mr-3 file:py-2 file:px-4
+                                                      file:rounded-lg file:border-0
+                                                      file:text-xs file:font-bold
+                                                      file:bg-blue-50 file:text-blue-700
+                                                      hover:file:bg-blue-100
+                                                      border rounded-lg @error('before_photos.'.($i-1)) border-red-300 bg-red-50/30 input-error @else border-gray-200 @enderror
+                                                      transition-all outline-none" />
+                                    </div>
+                                    @error('before_photos.'.($i-1))
+                                        <p class="mt-1 text-[10px] text-red-600 font-medium">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                @endfor
+                            </div>
+                        </div>
+
                         {{-- Section 4: Deposit --}}
                         <div class="pt-6 border-t border-gray-100">
                             <div class="bg-blue-50 border @error('deposit_amount') border-red-200 bg-red-50/30 @else border-blue-100 @enderror rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -250,16 +272,16 @@ if ($length <= 4) return str_repeat('*', $length);
             </form>
         </div>
     </div>
-    </section>
+</section>
 
-    <script>
-        const form = document.getElementById('contractForm');
-        const submitBtn = document.getElementById('startContractBtn');
+<script>
+    const form = document.getElementById('contractForm');
+    const submitBtn = document.getElementById('startContractBtn');
 
-        form.onsubmit = (e) => {
-            submitBtn.disabled = true;
-            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
-            submitBtn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Processing...</span>`;
-        };
-    </script>
-    @endsection
+    form.onsubmit = (e) => {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+        submitBtn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Processing...</span>`;
+    };
+</script>
+@endsection

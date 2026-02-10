@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\CustomerWelcomeMail;
 use App\Models\CRM\Lead;
 use App\Models\Local\Leads\Document;
+use App\Services\CRMService;
 use App\Services\SigningService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,9 +14,12 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Imagick\Driver;
+
 class ContractController extends Controller
 {
-    public function details(Request $request, SigningService $signingService, $id)
+    public function details(Request $request, CRMService $crm, SigningService $signingService, $id)
     {
         $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
 
@@ -32,6 +36,11 @@ class ContractController extends Controller
                 'address_line_2' => 'nullable|string|max:255',
                 'city'           => 'required|string|max:255',
                 'postcode'       => 'required|string|max:10',
+
+                // Photo Validation
+                'before_photos'   => 'required|array|min:3',
+                'before_photos.*' => 'required|file|mimes:jpeg,png,jpg,webp,heic,heif|max:10240', // Increased to 10MB for high-res HEICs
+
                 'deposit_amount' => [
                     'required',
                     'numeric',
@@ -93,6 +102,25 @@ class ContractController extends Controller
                         'qty' => 1,
                     ],
                 ];
+            }
+
+
+            $i = 1;
+            foreach ($request->file('before_photos') as $photo) {
+                $extension = strtolower($photo->getClientOriginalExtension());
+                $filename = "before-{$i}.{$extension}";
+
+                // 2. Upload to CRM using your existing method
+                $test = $crm->uploadDocument(
+                    $lead->id,
+                    -1,
+                    $photo->get(),
+                    $filename,
+                    'PHOTO',
+                    -1
+                );
+
+                $i++;
             }
 
             // 5. Signing Service Data
