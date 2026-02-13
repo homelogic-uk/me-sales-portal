@@ -43,7 +43,7 @@
 
                                     <div class="min-w-0 flex-1">
                                         <p class="text-sm font-medium text-blue-600 truncate">
-                                            {{ $lead->name }} {{ $lead->surname }}
+                                            {{ $lead->name ?? '-' }} {{ $lead->surname ?? '-' }}
                                         </p>
 
                                         <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
