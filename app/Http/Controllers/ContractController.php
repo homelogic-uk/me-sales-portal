@@ -270,7 +270,7 @@ class ContractController extends Controller
 
         if (Storage::disk('local')->put($fileName, $signingService->downloadDocument($document->document_id))) {
             Mail::to($lead->email)
-                ->bcc('info@logicfoam.com')
+                ->bcc('info@myenergy.co.uk')
                 ->send(new CustomerWelcomeMail(strtolower(ucwords($lead->name . ' ' . $lead->surname)), $fileName));
         }
 

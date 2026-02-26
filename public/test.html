@@ -3,110 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOSTKI | Video Portal</title>
+    <title>Spray Foam Removal Certificate - SR53820</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --mostki-slate: #5A767E;
-            --mostki-bg: #F8F9FA;
+        @page { size: A4 landscape; margin: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #334155; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;}
+        .a4-landscape {
+            width: 297mm; height: 210mm; padding: 10mm 15mm; margin: auto;
+            background: white; display: flex; flex-direction: column; box-sizing: border-box;
+            overflow: hidden;
         }
-        .bg-mostki { background-color: var(--mostki-slate); }
-        .text-mostki { color: var(--mostki-slate); }
-        .border-mostki { border-color: var(--mostki-slate); }
-
-        .font-serif-mostki {
-            font-family: 'Georgia', 'Times New Roman', serif;
-        }
-
-        #meetingSDKElement {
-            width: 100%;
-            height: 100%;
-            background: #1e2527;
-            border-radius: 0.5rem;
-        }
-
-        .modal-overlay {
-            backdrop-filter: blur(12px);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .text-navy { color: #0046ad; }
+        .text-crimson { color: #e31e24; }
+        .bg-navy { background-color: #0046ad; }
+        /* Professional tracking for the header */
+        .header-main { letter-spacing: 0.05em; }
+        .header-sub { letter-spacing: 0.3em; }
     </style>
 </head>
-<body class="bg-[#F2F4F5] font-sans overflow-hidden">
+<body>
 
-    <div id="nameModal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay bg-slate-900/40">
-        <div class="bg-white rounded-lg shadow-2xl w-full max-w-md p-10 border-b-4 border-mostki">
-            <div class="text-center mb-8">
-                <h1 class="text-5xl font-serif-mostki tracking-widest text-mostki mb-1">MOSTKI</h1>
-                <p class="text-[10px] tracking-[0.5em] text-mostki/70 uppercase border-t border-mostki/20 pt-2 mx-auto w-fit">
-                    ŻELAZOWA WOLA
-                </p>
+    <div class="a4-landscape">
+        <div class="flex justify-between items-start mb-8">
+            <div class="flex items-center space-x-5">
+                <div class="w-1 h-12 bg-navy opacity-20"></div>
+                <div class="flex flex-col">
+                    <h1 class="header-main text-2xl font-medium tracking-tight text-navy leading-none">
+                        SPRAY FOAM <span class="text-crimson font-semibold text-opacity-90">REMOVAL</span>
+                    </h1>
+                    <h2 class="header-sub text-[11px] font-bold text-gray-400 mt-2 uppercase">
+                        Certificate
+                    </h2>
+                </div>
             </div>
 
-            <form id="joinForm" class="space-y-6">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Guest Identity</label>
-                    <input
-                        type="text"
-                        id="userName"
-                        required
-                        placeholder="Enter your name"
-                        class="w-full px-4 py-3 rounded border border-slate-200 focus:border-mostki focus:ring-1 focus:ring-mostki outline-none transition-all text-gray-700 bg-slate-50"
-                    >
-                </div>
-                <button type="submit" class="w-full bg-mostki text-white font-serif-mostki italic text-lg py-4 rounded hover:bg-[#4A6369] transition-colors shadow-md">
-                    Join Portal
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <header class="bg-white border-b border-slate-200 px-10 py-4 grid grid-cols-3 items-center relative z-10">
-        <div class="flex items-center">
-             <div class="h-2 w-2 rounded-full bg-mostki animate-pulse"></div>
+            <div class="text-right">
+                <img src="https://myenergy.co.uk/wp-content/uploads/2021/06/me-logo.png.webp" alt="MyEnergy Logo" class="h-12 w-auto object-contain ml-auto">
+                <!-- <p class="text-[8px] text-gray-400 mt-1 uppercase tracking-widest font-medium">Part of LogicFoam Group</p> -->
+            </div>
         </div>
 
-        <div class="flex flex-col items-center justify-center">
-            <h1 class="text-3xl font-serif-mostki tracking-[0.25em] text-mostki leading-none">MOSTKI</h1>
-            <span class="text-[7px] tracking-[0.5em] text-mostki uppercase mt-1">ŻELAZOWA WOLA</span>
-        </div>
-
-        <div class="flex items-center justify-end space-x-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-mostki/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div id="systemClock" class="text-xs font-mono font-bold text-slate-500 tracking-widest">00:00:00</div>
-        </div>
-    </header>
-
-    <main class="p-8 h-[calc(100vh-84px)]">
-        <div class="h-full w-full max-w-6xl mx-auto">
-            <div class="bg-white h-full p-3 rounded shadow-xl border border-slate-200">
-                <div id="meetingSDKElement" class="flex items-center justify-center">
-                    <div class="text-center opacity-10">
-                        <h2 class="text-6xl font-serif-mostki tracking-[0.4em] text-white">MOSTKI</h2>
+        <div class="grid grid-cols-3 gap-8 mb-6">
+            <div>
+                <h3 class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 border-b border-gray-100 pb-1">Site Address</h3>
+                <p class="text-[13px] leading-tight font-medium text-slate-800">
+                    Miss Susan Quinn<br>9 Cleveland Avenue<br>High Ercall, TELFORD<br>TF6 6AH
+                </p>
+            </div>
+            <div>
+                <h3 class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 border-b border-gray-100 pb-1">Delivery Address</h3>
+                <p class="text-[13px] leading-tight text-slate-600">
+                    Miss Susan Quinn<br>9 Cleveland Avenue<br>High Ercall, TELFORD<br>TF6 6AH
+                </p>
+            </div>
+            <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                <h3 class="text-[9px] font-bold text-navy uppercase tracking-widest mb-2">Schedule of Work</h3>
+                <div class="space-y-1.5 text-[11px]">
+                    <div class="flex justify-between border-b border-slate-200/50 pb-0.5">
+                        <span class="text-gray-400 italic text-[10px]">Certificate No:</span> <span class="font-semibold text-navy">SR53820</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200/50 pb-0.5">
+                        <span class="text-gray-400 italic text-[10px]">Completion:</span> <span class="font-semibold text-navy">14/04/2025</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400 italic text-[10px]">Contractor:</span> <span class="font-semibold text-navy">LogicFoam Limited</span>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
 
-    <script>
-        const modal = document.getElementById('nameModal');
-        const joinForm = document.getElementById('joinForm');
-        const clockElement = document.getElementById('systemClock');
+        <div class="flex-grow">
+            <table class="w-full text-left mb-6">
+                <thead>
+                    <tr class="border-b-2 border-slate-100">
+                        <th class="py-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest">Description of Service</th>
+                        <th class="py-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest text-right">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b border-slate-50">
+                        <td class="py-4 text-[14px] text-slate-700 font-medium">Comprehensive Removal of Spray Foam Insulation from Loft Space</td>
+                        <td class="py-4 text-base font-semibold text-navy text-right">76.00</td>
+                    </tr>
+                </tbody>
+            </table>
 
-        function updateSystemClock() {
-            const now = new Date();
-            clockElement.innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-        }
-        setInterval(updateSystemClock, 1000);
-        updateSystemClock();
+            <div class="p-4 bg-navy rounded mb-6">
+                <p class="text-[11px] leading-relaxed text-white font-light text-center px-8">
+                    This certificate formally confirms that the spray foam insulation previously installed in the loft of the mentioned property has been removed in strict accordance with current guidance and industry standards as per product certification <span class="font-bold underline tracking-wider">BAR-21-195-P-A-UK</span>.
+                </p>
+            </div>
 
-        joinForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            modal.classList.add('opacity-0', 'pointer-events-none');
-        });
-    </script>
+            <div class="flex flex-col items-start">
+                <p class="text-[8px] font-bold text-gray-300 uppercase tracking-[0.2em] mb-3">Certified Compliance & Accreditations</p>
+                <div class="flex justify-start space-x-4">
+                    <div class="w-16 h-10 border border-slate-100 rounded flex items-center justify-center text-[7px] text-slate-300 font-bold uppercase tracking-tighter bg-slate-50/30">Trustmark</div>
+                    <div class="w-16 h-10 border border-slate-100 rounded flex items-center justify-center text-[7px] text-slate-300 font-bold uppercase tracking-tighter bg-slate-50/30">RECC</div>
+                    <div class="w-16 h-10 border border-slate-100 rounded flex items-center justify-center text-[7px] text-slate-300 font-bold uppercase tracking-tighter bg-slate-50/30">IWA</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-auto pt-4 border-t border-slate-100 flex justify-between items-end">
+            <div class="text-[9px] text-slate-400 space-y-0.5">
+                <p class="font-bold text-slate-500 uppercase tracking-tight text-[10px]">LogicFoam Ltd t/a MyEnergy</p>
+                <p>Company No: 13172592 | 145 St James Road, Southampton, Hampshire, SO15 5QF</p>
+            </div>
+            <div class="text-right">
+                <p class="text-lg font-medium text-navy leading-none">0800 1700 680</p>
+                <p class="text-[9px] font-bold text-crimson uppercase tracking-widest mt-1">WWW.MYENERGY.CO.UK</p>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
