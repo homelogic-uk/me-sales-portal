@@ -6,6 +6,7 @@ use App\Mail\CustomerWelcomeMail;
 use App\Models\CRM\Lead;
 use App\Models\Local\Leads\Document;
 use App\Services\CRMService;
+use App\Services\EmailValidationService;
 use App\Services\SigningService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,7 @@ use Intervention\Image\Drivers\Imagick\Driver;
 
 class ContractController extends Controller
 {
-    public function details(Request $request, CRMService $crm, SigningService $signingService, $id)
+    public function details(Request $request, EmailValidationService $mail, CRMService $crm, SigningService $signingService, $id)
     {
         $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
 
@@ -29,7 +30,15 @@ class ContractController extends Controller
                 'title'          => 'required|string|max:10',
                 'name'           => 'required|string|max:255',
                 'surname'        => 'required|string|max:255',
-                'email'          => 'required|email|max:255',
+                'email'          => [
+                    'required',
+                    'email',
+                    'max:255',
+                    function ($attribute, $value, $fail) use ($mail) {
+                        if (!$mail->checkEmail($value))
+                            $fail('The email supplied appears to be invalid, check the email and try again.');
+                    }
+                ],
                 'phone_landline' => 'nullable|string|max:20',
                 'phone_mobile'   => 'nullable|string|max:20',
                 'address_line_1' => 'required|string|max:255',

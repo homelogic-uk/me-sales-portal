@@ -39,4 +39,8 @@ return [
         'api_key' => env('PANDADOC_API_KEY'),
     ],
 
+    'email' => [
+        'api_key' => env('EMAIL_VALIDATION_API_KEY')
+    ]
+
 ];
