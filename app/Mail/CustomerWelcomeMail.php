@@ -47,7 +47,7 @@ class CustomerWelcomeMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.external-contract',
+            view: 'mail.welcome',
         );
     }
 
