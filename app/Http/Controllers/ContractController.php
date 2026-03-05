@@ -273,7 +273,7 @@ class ContractController extends Controller
         if ($document->status == 'document.completed')
             abort(404);
 
-        $document->update(['status' => 'document.completed']);
+        $document->update(['status' => 'document.completed', 'mail_sent' => 'Y']);
 
         $fileName = Str::uuid() . '.pdf';
 

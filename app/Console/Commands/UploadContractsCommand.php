@@ -24,6 +24,7 @@ class UploadContractsCommand extends Command
     {
         $documents = Document::where('status', 'document.completed')
             ->where('uploaded', 'N')
+            ->where('mail_sent', 'Y')
             ->get();
 
         if ($documents->isEmpty()) {

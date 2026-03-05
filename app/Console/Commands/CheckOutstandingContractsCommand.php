@@ -33,6 +33,8 @@ class CheckOutstandingContractsCommand extends Command
         // 1. Process in chunks to prevent memory crashes
         Document::with('lead')
             ->where('uploaded', 'N')
+            ->where('mail_sent', 'N')
+            ->where('created_at', '>=', now()->subDays(5))
             ->chunkById(100, function ($documents) use ($signing) {
                 foreach ($documents as $document) {
                     $this->processDocument($document, $signing);
@@ -60,6 +62,7 @@ class CheckOutstandingContractsCommand extends Command
             if ($status === 'document.completed') {
                 $document->update([
                     'status' => 'document.completed',
+                    'mail_sent' => 'Y'
                 ]);
 
                 $fileName = 'temp_contracts/' . Str::uuid() . '.pdf';
