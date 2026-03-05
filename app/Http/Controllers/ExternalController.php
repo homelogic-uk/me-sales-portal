@@ -41,7 +41,7 @@ class ExternalController extends Controller
         return view('contract.signing', compact('lead', 'document', 'sessionId', 'signingUrl'));
     }
 
-    public function complete(Request $request, SigningService $signingService, $id, $documentId)
+    public function complete(Request $request, SigningService $signingService, $documentId)
     {
         // 1. Use a more concise query or route model binding
         $document = Document::where('uuid', $documentId)
