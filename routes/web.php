@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExternalController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\QuoteController;
@@ -10,6 +11,11 @@ use Illuminate\Support\Facades\Route;
 Route::match(['GET', 'POST'], 'login', [LoginController::class, 'login'])->name('login');
 // Dashboard
 Route::middleware('auth')->get('/', [DashboardController::class, 'index'])->name('dashboard.index');
+
+Route::prefix('external')->name('external.')->group(function () {
+    Route::match(['GET', 'POST'], 'signing/{documentId}', [ExternalController::class, 'signing'])->name('signing');
+    Route::match(['GET', 'POST'], 'complete/{documentId}', [ExternalController::class, 'complete'])->name('complete');
+});
 
 // Leads, Quotes, and Contracts grouped by lead ID
 Route::middleware(['auth', 'check.for.contract'])->prefix('view/{id}')->name('leads.')->group(function () {
@@ -29,8 +35,9 @@ Route::middleware(['auth', 'check.for.contract'])->prefix('view/{id}')->name('le
     Route::prefix('contract')->name('contract.')->group(function () {
         Route::match(['GET', 'PUT'], '/', [ContractController::class, 'details'])->name('details');
         Route::match(['GET', 'PUT'], '/generate/{uuid}', [ContractController::class, 'generate'])->name('generate');
-        Route::match(['GET', 'PUT'], '/signing/{uuid}', [ContractController::class, 'signing'])->name('signing');
-        Route::match(['GET', 'PUT'], '/{uuid}/complete', [ContractController::class, 'complete'])->name('complete');
+        Route::match(['GET', 'PUT', 'POST'], '/signing/{uuid}', [ContractController::class, 'signing'])->name('signing');
+        Route::match(['GET', 'PUT'], '/complete/{uuid}', [ContractController::class, 'complete'])->name('complete');
+        Route::match(['GET', 'PUT'], '/sent/{uuid}', [ContractController::class, 'sentToClient'])->name('sent-to-client');
 
         Route::get('status/{uuid}', [ContractController::class, 'status'])->name('status');
     });

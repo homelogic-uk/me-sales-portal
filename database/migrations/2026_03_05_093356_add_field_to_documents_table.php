@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('lead_documents', function (Blueprint $table) {
-            $table->enum('mail_sent', ['Y', 'N'])->default('N');
+            $table->enum('mail_sent', ['Y', 'N'])->default('N')->after('document_id');
         });
     }
 

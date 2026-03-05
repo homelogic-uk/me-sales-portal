@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContractSentMail;
 use App\Mail\CustomerWelcomeMail;
 use App\Models\CRM\Lead;
 use App\Models\Local\Leads\Document;
@@ -239,13 +240,33 @@ class ContractController extends Controller
 
     public function signing(Request $request, SigningService $signingService, $id, $documentId)
     {
-        // 1. Use a more concise query or route model binding
         $document = Document::where('lead_id', $id)
             ->where('status', '!=', 'document.completed')
             ->where('uuid', $documentId)
             ->firstOrFail();
 
         $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+        $signingUrl = route('external.signing', ['documentId' => $document->uuid]);
+
+        if ($request->isMethod('POST')) {
+            $type = $request->type;
+
+            switch ($type) {
+                case "amend": {
+                        $document->update(['status' => 'document.abandoned']);
+
+                        return redirect()->route('leads.view', ['id' => $lead->id]);
+                    }
+
+                case "send": {
+                        Mail::to($lead->email)
+                            ->bcc('info@myenergy.co.uk')
+                            ->send(new ContractSentMail($signingUrl));
+
+                        return redirect()->route('leads.contract.sent-to-client', ['id' => $id, 'uuid' => $documentId]);
+                    }
+            }
+        }
 
         $sessionId = null;
         $cacheKey = $id . '_signing_session_' . $documentId;
@@ -257,7 +278,7 @@ class ContractController extends Controller
             }
         }
 
-        return view('contract.signing', compact('lead', 'document', 'sessionId'));
+        return view('contract.signing', compact('lead', 'document', 'sessionId', 'signingUrl'));
     }
 
     public function complete(Request $request, SigningService $signingService, $id, $documentId)
@@ -284,6 +305,19 @@ class ContractController extends Controller
         }
 
         return view('contract.complete', compact('lead'));
+    }
+
+    public function sentToClient(Request $request, $id, $documentId)
+    {
+        // 1. Use a more concise query or route model binding
+        $document = Document::where('lead_id', $id)
+            ->where('status', '!=', 'document.completed')
+            ->where('uuid', $documentId)
+            ->firstOrFail();
+
+        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+
+        return view('contract.sent-to-client', compact('lead'));
     }
 
     /**

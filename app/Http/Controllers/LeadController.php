@@ -21,10 +21,6 @@ class LeadController extends Controller
         $products = Product::where('enabled', 'Y')
             ->get();
 
-        if ($liveSigningDocument = Document::where('lead_id', $id)->where('status', '!=', 'document.completed')->first()) {
-            return redirect()->route('leads.contract.generate', ['id' => $lead->id, 'uuid' => $liveSigningDocument->uuid]);
-        }
-
         if ($request->isMethod('POST')) {
             $product = $request->product;
 

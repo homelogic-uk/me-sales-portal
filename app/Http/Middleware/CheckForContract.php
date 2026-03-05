@@ -18,7 +18,7 @@ class CheckForContract
     public function handle(Request $request, Closure $next): Response
     {
 
-        $excludedRoutes = ['leads.contract.generate', 'leads.contract.signing', 'leads.contract.complete', 'leads.contract.status'];
+        $excludedRoutes = ['leads.contract.generate', 'leads.contract.signing', 'leads.contract.complete', 'leads.contract.status', 'leads.contract.sent-to-client'];
 
         $route = $request->route();
 
@@ -34,8 +34,9 @@ class CheckForContract
             ) {
                 $lead = Auth::user()->leads->where('rep', Auth::user()->user_id)->where('id', $id)->firstOrFail();
 
-                if ($liveSigningDocument = Document::where('lead_id', $id)->where('status', '!=', 'document.completed')->first())
+                if ($liveSigningDocument = Document::where('lead_id', $id)->whereNotIn('status', ['document.completed', 'document.abandoned'])->first()) {
                     return redirect()->route('leads.contract.generate', ['id' => $lead->id, 'uuid' => $liveSigningDocument->uuid]);
+                }
             }
         }
 

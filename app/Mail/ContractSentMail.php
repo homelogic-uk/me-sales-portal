@@ -5,26 +5,23 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Address;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 
-class CustomerWelcomeMail extends Mailable
+class ContractSentMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $name;
-    public $filePath;
+    public $signingUrl = null;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($name, $filePath)
+    public function __construct($signingUrl)
     {
-        $this->name = $name;
-        $this->filePath = $filePath;
+        $this->signingUrl = $signingUrl;
     }
 
     /**
@@ -37,7 +34,7 @@ class CustomerWelcomeMail extends Mailable
             replyTo: [
                 new Address('info@myenergy.co.uk', 'My Energy'),
             ],
-            subject: 'MyEnergy - Welcome',
+            subject: 'MyEnergy - Sign Your Contract',
         );
     }
 
@@ -58,10 +55,6 @@ class CustomerWelcomeMail extends Mailable
      */
     public function attachments(): array
     {
-        return [
-            Attachment::fromStorage($this->filePath)
-                ->as('contract.pdf')
-                ->withMime('application/pdf'),
-        ];
+        return [];
     }
 }
