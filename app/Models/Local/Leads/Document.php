@@ -23,6 +23,7 @@ class Document extends Model
         'provider',
         'document_id',
         'uploaded',
+        'mail_sent'
     ];
 
     /**
