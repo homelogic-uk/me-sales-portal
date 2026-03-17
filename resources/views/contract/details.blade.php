@@ -121,9 +121,10 @@ $titleOptions = ['Mr', 'Mrs', 'Miss', 'Ms', 'Master', 'Dr', 'Prof', 'Rev', 'Sir'
                             <div class="sm:col-span-2 flex flex-wrap gap-4">
                                 <div class="w-28 flex-shrink-0">
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wider">Title</label>
-                                    <select name="title" class="w-full rounded-lg border @error('title') border-red-300 bg-red-50/50 input-error @else border-gray-300 bg-white @enderror px-3 py-2.5 text-sm focus:ring-2 @error('title') focus:ring-red-200 @else focus:ring-blue-500 @enderror outline-none transition-all">
+                                    <select name="title" required class="w-full rounded-lg border @error('title') border-red-300 bg-red-50/50 input-error @else border-gray-300 bg-white @enderror px-3 py-2.5 text-sm focus:ring-2 @error('title') focus:ring-red-200 @else focus:ring-blue-500 @enderror outline-none transition-all">
+                                        <option value="" disabled selected hidden>Select a title...</option>
                                         @foreach($titleOptions as $option)
-                                        <option value="{{ $option }}" {{ old('title', $lead->title) === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                            <option value="{{ $option }}">{{ $option }}</option>
                                         @endforeach
                                     </select>
                                 </div>
