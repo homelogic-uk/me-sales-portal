@@ -80,9 +80,11 @@ class Survey extends Model
                         '--disable-setuid-sandbox',
                         '--disable-dev-shm-usage',
                         '--no-zygote',
-                        '--disable-crash-reporter', // Directly fixes the crashpad error
-                        '--disable-gpu',            // Prevents graphics engine crashes on Linux
-                        '--single-process'          // Runs everything in one process (good for restricted servers)
+                        '--disable-gpu',
+                        '--single-process',
+                        '--disable-features=Crashpad',      // Stronger directive to kill the crash reporter
+                        '--crash-dumps-dir=/tmp',           // If it still tries, give it a highly writable temp folder
+                        '--user-data-dir=/tmp/chrome-data'  // Gives the browser a guaranteed writable profile directory
                     ]);
             })
             ->disk('local')
