@@ -174,7 +174,7 @@ class ContractController extends Controller
 
             $document = $signingService->createDocument($fileData);
 
-            dd($document);
+            // dd($document);
 
             if (isset($document['type']) && $document['type'] === 'validation_error') {
                 return back()->withErrors(['api' => 'PandaDoc Error: ' . ($document['detail']['metadata'][0] ?? 'Check field formatting.')])->withInput();
