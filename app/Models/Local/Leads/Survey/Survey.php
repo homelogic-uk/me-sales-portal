@@ -81,8 +81,7 @@ class Survey extends Model
                         '--disable-dev-shm-usage', // Important for Docker/Low-RAM VPS
                         '--disable-extensions',
                         '--no-zygote'
-                    ])
-                    ->save($fileName);
+                    ]);
             })
             ->disk('local')
             ->save($fileName);
