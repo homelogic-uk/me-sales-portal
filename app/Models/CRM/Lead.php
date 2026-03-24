@@ -28,6 +28,11 @@ class Lead extends Model
         return $this->hasOne(Product::class, 'id', 'product');
     }
 
+    public function getFullName()
+    {
+        return $this->name . ' ' . $this->surname;
+    }
+
     /**
      * The attributes that are mass assignable.
      *

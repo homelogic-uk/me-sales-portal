@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CRM\Lead;
 use App\Models\Local\Leads\Discount;
 use App\Models\Local\Leads\Quote;
+use App\Models\Local\Leads\Survey\Survey;
 use App\Models\Local\Products\Option;
 use App\Models\Local\Products\Product;
 use Illuminate\Http\Request;
@@ -27,6 +28,12 @@ class QuoteController extends Controller
 
         if (!$product)
             abort(404);
+
+        $survey = Survey::where('lead_id', $id)->where('product_id', $product->id)->first();
+
+        if ($product->survey->count() && !$survey) {
+            return redirect()->route('leads.quote.survey.view', ['id' => $id, 'productId' => $product->id]);
+        }
 
         if ($request->isMethod('POST')) {
             $options = $request->options;

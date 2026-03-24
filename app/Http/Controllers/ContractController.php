@@ -88,7 +88,11 @@ class ContractController extends Controller
 
             // 4. Build Pricing Table
             $quote = $lead->quotes->first();
-            if (!$quote) abort(404);
+
+            if (!$quote)
+                abort(404);
+
+            $surveyTable = $quote->buildSurveyTable();
 
             $lineItems = $quote->buildPricingTable();
 
@@ -137,7 +141,7 @@ class ContractController extends Controller
             $fullName = "{$lead->name} {$lead->surname}";
 
             $fileData = [
-                'template_uuid' => '2WTtXSJnTYTiJFVvXvt2P6',
+                'template_uuid' => 'jH4LqEw2MKrsKQuWCvqVHX',
                 'name' => "MyEnergy - Contract - {$lead->surname}",
                 'recipients' => [[
                     'email' => $lead->email,
@@ -153,7 +157,9 @@ class ContractController extends Controller
                     ["name" => "clientName", "value" => $fullName],
                     ["name" => "clientAddressLine1", "value" => (string) $lead->address_line_1],
                     ["name" => "clientCity", "value" => (string) $lead->city],
-                    ["name" => "clientPostcode", "value" => (string) $lead->postcode]
+                    ["name" => "clientPostcode", "value" => (string) $lead->postcode],
+                    ["name" => "surveyPresent", "value" => true],
+                    ["name" => "Representative.Name", "value" => Auth::user()->user_name . ' ' . Auth::user()->user_surname]
                 ],
                 'pricing_tables' => [[
                     'name' => 'Contract Pricing',
@@ -163,7 +169,25 @@ class ContractController extends Controller
                         'default' => true,
                         'rows' => $lineItems,
                     ]],
-                ]]
+                ]],
+                // 'tables' => [
+                //     [
+                //         'name'  => 'surveyTable', // Must match exactly with the table name in the template
+                //         'data'  => [
+                //             'sections' => [
+                //                 [
+                //                     // Define your columns
+                //                     'header' => [
+                //                         ['text' => 'Question'],
+                //                         ['text' => 'Answer']
+                //                     ],
+                //                     // Provide your row data sequentially
+                //                     'rows' => $surveyTable
+                //                 ]
+                //             ]
+                //         ]
+                //     ]
+                // ],
             ];
 
             $document = $signingService->createDocument($fileData);

@@ -4,6 +4,7 @@ namespace App\Models\Local\Leads;
 
 use App\Models\CRM\Lead;
 use App\Models\Local\Leads\Discount;
+use App\Models\Local\Leads\Survey\Survey;
 use App\Models\Local\Products\Product;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,6 +34,29 @@ class Quote extends Model
     public function extras()
     {
         return json_decode($this->extras);
+    }
+
+    public function survey()
+    {
+        return $this->hasOne(Survey::class, 'lead_id', 'lead_id')->where('product_id', $this->product_id);
+    }
+
+    public function buildSurveyTable()
+    {
+        // 1. Ensure survey exists to avoid "Attempt to read property on null"
+        if (!$this->survey || !is_array($this->survey->answers)) {
+            return [];
+        }
+
+        // 2. Map the answers into your custom structure
+        $formattedTable = collect($this->survey->answers)->map(function ($item) {
+            return [
+                ['text' => $item['question'] ?? 'N/A'], // Column 1
+                ['text' => $item['answer'] ?? 'N/A']   // Column 2
+            ];
+        })->values()->all();
+
+        return $formattedTable;
     }
 
     public function buildPricingTable()

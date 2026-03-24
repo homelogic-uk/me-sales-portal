@@ -33,6 +33,11 @@ class CRMUser extends Authenticatable
         return $this->user_password;
     }
 
+    public function getFullName()
+    {
+        return $this->user_name . ' ' . $this->user_surname;
+    }
+
     public function leads()
     {
         // hasMany(RelatedModel, foreignKey, localKey)

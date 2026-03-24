@@ -14,10 +14,6 @@ class LeadController extends Controller
     {
         $liveSigningDocument = null;
         $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
-
-        if (!$lead)
-            abort(404);
-
         $products = Product::where('enabled', 'Y')
             ->get();
 

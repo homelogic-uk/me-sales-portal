@@ -18,6 +18,7 @@ class Document extends Model
      */
     protected $fillable = [
         'uuid',
+        'type',
         'status',
         'lead_id',
         'provider',

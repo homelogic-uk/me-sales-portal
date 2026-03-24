@@ -6,6 +6,7 @@ use App\Http\Controllers\ExternalController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\SurveyController;
 use Illuminate\Support\Facades\Route;
 
 Route::match(['GET', 'POST'], 'login', [LoginController::class, 'login'])->name('login');
@@ -29,6 +30,10 @@ Route::middleware(['auth', 'check.for.contract'])->prefix('view/{id}')->name('le
         Route::match(['POST'], '/discount/apply', [QuoteController::class, 'addDiscount'])->name('addDiscount');
         Route::match(['DELETE'], '/discount/delete', [QuoteController::class, 'removeDiscount'])->name('removeDiscount');
         Route::match(['GET', 'POST'], '/{product}', [QuoteController::class, 'create'])->name('create');
+
+        Route::prefix('survey')->name('survey.')->group(function () {
+            Route::match(['GET', 'POST', 'DELETE'], '{productId}', [SurveyController::class, 'view'])->name('view');
+        });
     });
 
     // Contracts
