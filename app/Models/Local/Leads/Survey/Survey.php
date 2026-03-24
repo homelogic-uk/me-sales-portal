@@ -74,11 +74,15 @@ class Survey extends Model
 
         Pdf::view('pdf.survey', compact('survey'))
             ->withBrowsershot(function ($browsershot) {
-                $browsershot->noSandbox()
+                $browsershot->setChromePath('/opt/puppeteer-chrome/chrome')
+                    ->noSandbox()
                     ->addArgs([
                         '--disable-setuid-sandbox',
                         '--disable-dev-shm-usage',
-                        '--no-zygote'
+                        '--no-zygote',
+                        '--disable-crash-reporter', // Directly fixes the crashpad error
+                        '--disable-gpu',            // Prevents graphics engine crashes on Linux
+                        '--single-process'          // Runs everything in one process (good for restricted servers)
                     ]);
             })
             ->disk('local')
