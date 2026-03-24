@@ -74,13 +74,18 @@ class Survey extends Model
 
         Pdf::view('pdf.survey', compact('survey'))
             ->withBrowsershot(function ($browsershot) {
+                putenv('HOME=/tmp');
+                putenv('XDG_CONFIG_HOME=/tmp');
+
                 $browsershot->setChromePath('/opt/puppeteer-chrome/chrome')
                     ->noSandbox()
-                    ->addArgs([
+                    ->addChromiumArguments([
                         '--no-sandbox',
                         '--disable-setuid-sandbox',
-                        '--user-data-dir=/var/www/.puppeteer', // Point to the folder we created
                         '--disable-dev-shm-usage',
+                        '--disable-extensions',
+                        '--disable-gpu',
+                        '--user-data-dir=/tmp/browser-profile', // Explicitly set the data dir
                     ]);
             })
             ->disk('local')
