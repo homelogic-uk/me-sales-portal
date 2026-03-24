@@ -77,14 +77,10 @@ class Survey extends Model
                 $browsershot->setChromePath('/opt/puppeteer-chrome/chrome')
                     ->noSandbox()
                     ->addArgs([
+                        '--no-sandbox',
                         '--disable-setuid-sandbox',
+                        '--user-data-dir=/var/www/.puppeteer', // Point to the folder we created
                         '--disable-dev-shm-usage',
-                        '--no-zygote',
-                        '--disable-gpu',
-                        '--single-process',
-                        '--disable-features=Crashpad',      // Stronger directive to kill the crash reporter
-                        '--crash-dumps-dir=/tmp',           // If it still tries, give it a highly writable temp folder
-                        '--user-data-dir=/tmp/chrome-data'  // Gives the browser a guaranteed writable profile directory
                     ]);
             })
             ->disk('local')
