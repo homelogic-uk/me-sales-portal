@@ -77,8 +77,7 @@ class Survey extends Model
                 putenv('HOME=/tmp');
                 putenv('XDG_CONFIG_HOME=/tmp');
 
-                $browsershot->setChromePath('/opt/puppeteer-chrome/chrome')
-                    ->noSandbox()
+                $browsershot->noSandbox()
                     ->addChromiumArguments([
                         '--no-sandbox',
                         '--disable-setuid-sandbox',
