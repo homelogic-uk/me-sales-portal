@@ -170,27 +170,11 @@ class ContractController extends Controller
                         'rows' => $lineItems,
                     ]],
                 ]],
-                // 'tables' => [
-                //     [
-                //         'name'  => 'surveyTable', // Must match exactly with the table name in the template
-                //         'data'  => [
-                //             'sections' => [
-                //                 [
-                //                     // Define your columns
-                //                     'header' => [
-                //                         ['text' => 'Question'],
-                //                         ['text' => 'Answer']
-                //                     ],
-                //                     // Provide your row data sequentially
-                //                     'rows' => $surveyTable
-                //                 ]
-                //             ]
-                //         ]
-                //     ]
-                // ],
             ];
 
             $document = $signingService->createDocument($fileData);
+
+            dd($document);
 
             if (isset($document['type']) && $document['type'] === 'validation_error') {
                 return back()->withErrors(['api' => 'PandaDoc Error: ' . ($document['detail']['metadata'][0] ?? 'Check field formatting.')])->withInput();
