@@ -82,7 +82,7 @@ class Survey extends Model
                         '--disable-extensions',
                         '--no-zygote'
                     ])
-                    ->save($path);
+                    ->save($fileName);
             })
             ->disk('local')
             ->save($fileName);
