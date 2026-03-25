@@ -47,8 +47,8 @@ class CRMUser extends Authenticatable
 
     public function scopedLeads()
     {
-        $days = 3;
-        $cutoffDate = now()->subDays($days)->toDateString();
+        $days = 2;
+        $cutoffDate = now()->subDays($days);
 
         // Case 1: ROOT - Access to everything
         if ($this->user_group === 'ROOT') {
