@@ -43,7 +43,7 @@ class SurveyController extends Controller
             ]);
 
             if ($filePath = $survey->generate()) {
-                Mail::to('ash@myenergy.co.uk')
+                Mail::to($lead->email)
                     ->bcc('info@myenergy.co.uk')
                     ->send(new ProductSurveyMail('', $filePath));
 
