@@ -208,28 +208,39 @@ $titleOptions = ['Mr', 'Mrs', 'Miss', 'Ms', 'Master', 'Dr', 'Prof', 'Rev', 'Sir'
                         <div class="pt-6 border-t border-gray-100">
                             <div class="mb-4">
                                 <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Before Photos</h3>
-                                <p class="text-xs text-gray-400 mt-1">Please upload at least 3 clear photos of the installation area.</p>
+                                <p class="text-xs text-gray-400 mt-1">Please upload at least 3 clear photos of the work space.</p>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                @for ($i = 1; $i <= 3; $i++)
-                                <div>
-                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 tracking-tight">Photo #{{ $i }}</label>
-                                    <div class="relative">
+                                @for ($i = 0; $i < 3; $i++)
+                                <div class="space-y-2">
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 tracking-tight">Photo #{{ $i + 1 }}</label>
+
+                                    {{-- Preview Container --}}
+                                    <div id="preview-container-{{ $i }}" class="hidden relative aspect-square w-full rounded-lg border border-gray-200 overflow-hidden bg-gray-50 group">
+                                        <img id="preview-{{ $i }}" src="" class="w-full h-full object-cover">
+                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <button type="button" onclick="removeImage({{ $i }})" class="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="relative" id="input-container-{{ $i }}">
                                         <input type="file"
-                                                required
-                                               name="before_photos[]"
+                                               required
                                                accept="image/*"
+                                               onchange="handleImageSelect(event, {{ $i }})"
                                                class="w-full text-xs text-gray-500
                                                       file:mr-3 file:py-2 file:px-4
                                                       file:rounded-lg file:border-0
                                                       file:text-xs file:font-bold
                                                       file:bg-blue-50 file:text-blue-700
                                                       hover:file:bg-blue-100
-                                                      border rounded-lg @error('before_photos.'.($i-1)) border-red-300 bg-red-50/30 input-error @else border-gray-200 @enderror
+                                                      border rounded-lg @error('before_photos.'.$i) border-red-300 bg-red-50/30 input-error @else border-gray-200 @enderror
                                                       transition-all outline-none" />
                                     </div>
-                                    @error('before_photos.'.($i-1))
+                                    @error('before_photos.'.$i)
                                         <p class="mt-1 text-[10px] text-red-600 font-medium">{{ $message }}</p>
                                     @enderror
                                 </div>
@@ -279,10 +290,133 @@ $titleOptions = ['Mr', 'Mrs', 'Miss', 'Ms', 'Master', 'Dr', 'Prof', 'Rev', 'Sir'
     const form = document.getElementById('contractForm');
     const submitBtn = document.getElementById('startContractBtn');
 
-    form.onsubmit = (e) => {
+    // This will hold our final compressed files ready for upload
+    const compressedFiles = {};
+
+    /**
+     * Triggered when a file is chosen
+     */
+    async function handleImageSelect(event, index) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // 1. Show Preview immediately for UX
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            document.getElementById(`preview-${index}`).src = e.target.result;
+            document.getElementById(`preview-container-${index}`).classList.remove('hidden');
+            document.getElementById(`input-container-${index}`).classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+
+        // 2. Compress the image in the background
+        compressedFiles[index] = await compressImage(file, {
+            maxWidth: 1600, // Max width in pixels
+            quality: 0.7    // 70% quality JPEG
+        });
+    }
+
+    /**
+     * Removes the image and allows the user to pick again
+     */
+    function removeImage(index) {
+        document.getElementById(`preview-container-${index}`).classList.add('hidden');
+        document.getElementById(`input-container-${index}`).classList.remove('hidden');
+
+        // Clear both the input and the stored compression
+        const input = document.querySelectorAll('input[type="file"]')[index];
+        if(input) input.value = '';
+        delete compressedFiles[index];
+    }
+
+    /**
+     * Compression Engine
+     */
+    async function compressImage(file, { maxWidth, quality }) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Calculate new dimensions
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxWidth) {
+                            width *= maxWidth / height;
+                            height = maxWidth;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Output as JPEG Blob
+                    canvas.toBlob((blob) => {
+                        resolve(new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now(),
+                        }));
+                    }, 'image/jpeg', quality);
+                };
+            };
+        });
+    }
+
+    /**
+     * Handle Submit
+     */
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+
+        // UI Loading State
         submitBtn.disabled = true;
         submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
         submitBtn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Processing...</span>`;
+
+        // Gather all form data
+        const formData = new FormData(form);
+
+        // The original file inputs in the form are actually empty (we didn't name them 'before_photos[]'
+        // to avoid double-sending). We add the compressed ones manually.
+        Object.keys(compressedFiles).forEach(key => {
+            formData.append('before_photos[]', compressedFiles[key]);
+        });
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+            if (response.redirected) {
+                // Success: Laravel did a redirect
+                window.location.href = response.url;
+            } else {
+                // Failure: Validation error or 500. Reload to let Laravel display errors.
+                location.reload();
+            }
+        } catch (error) {
+            console.error("Upload failed", error);
+            alert("An error occurred during submission. Please try again.");
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "<span>Start Contract</span>";
+        }
     };
 </script>
 @endsection
