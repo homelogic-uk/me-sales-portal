@@ -61,7 +61,7 @@ class CRMUser extends Authenticatable
                 ->whereIn('rep', function ($query) {
                     $query->select('user_id')
                         ->from('users')
-                        ->where('team_leader_id', $this->id) // Leads for their team
+                        ->where('team_leader_id', $this->user_id) // Leads for their team
                         ->orWhere('user_id', $this->user_id); // Leads for themselves
                 });
         }
