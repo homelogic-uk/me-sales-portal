@@ -76,19 +76,23 @@
                     </tr>
                 </thead>
                 <tbody class="text-xs">
-                    @foreach($survey->answers as $id => $data)
-                    <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
-                        {{-- <td class="py-2 px-2 text-slate-400 font-medium align-top">{{ $id }}</td> --}}
-                        <td class="py-2 px-2 text-slate-700 align-top">{{ $data['question'] }}</td>
-                        <td class="py-2 px-2 text-slate-600 align-top">
-                            @if(is_array($data['answer']))
-                                {{ implode(', ', $data['answer']) }}
-                            @else
-                                {{ $data['answer'] }}
-                            @endif
-                        </td>
-                    </tr>
-                    @endforeach
+                   @foreach($survey->answers as $id => $data)
+                    {{-- Verify that $data is an array and both keys are present and not empty --}}
+                    @if(isset($data['question'], $data['answer']) && !empty($data['question']))
+                        <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                            <td class="py-2 px-2 text-slate-700 align-top">
+                                {{ $data['question'] }}
+                            </td>
+                            <td class="py-2 px-2 text-slate-600 align-top">
+                                @if(is_array($data['answer']))
+                                    {{ implode(', ', array_filter($data['answer'])) }}
+                                @else
+                                    {{ $data['answer'] }}
+                                @endif
+                            </td>
+                        </tr>
+                    @endif
+                @endforeach
                 </tbody>
             </table>
         </main>
