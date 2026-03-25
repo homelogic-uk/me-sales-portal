@@ -15,7 +15,7 @@ class SurveyController extends Controller
 {
     public function view(Request $request, CRMService $crm, $id, $productId)
     {
-        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+        $lead = Auth::user()->scopedLeads()->where('id', $id)->firstOrFail();
         $product = Product::where('id', $productId)->firstOrFail();
 
         if (!$product->survey->count())

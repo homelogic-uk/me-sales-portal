@@ -16,7 +16,7 @@ class QuoteController extends Controller
 {
     public function create(Request $request, $id, $product)
     {
-        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+        $lead = Auth::user()->scopedLeads()->where('id', $id)->firstOrFail();
 
         if (!$lead)
             abort(404);
@@ -94,7 +94,7 @@ class QuoteController extends Controller
 
     public function view(Request $request, $id)
     {
-        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+        $lead = Auth::user()->scopedLeads()->where('id', $id)->firstOrFail();
 
         if (!$lead)
             abort(404);
@@ -119,7 +119,7 @@ class QuoteController extends Controller
     public function addDiscount(Request $request, $id)
     {
         // 1. Use relationship chaining to ensure the quote belongs to the authorized user's lead
-        $quote = Auth::user()->leads()->findOrFail($id)
+        $quote = Auth::user()->scopedLeads()->findOrFail($id)
             ->quotes()->findOrFail($request->quote_id);
 
         // 2. Validate input properly
@@ -146,7 +146,7 @@ class QuoteController extends Controller
     public function removeDiscount(Request $request, $id)
     {
         // Ensure the user owns the lead/quote before deleting
-        $quote = Auth::user()->leads()->findOrFail($id)
+        $quote = Auth::user()->scopedLeads()->findOrFail($id)
             ->quotes()->findOrFail($request->quote_id);
 
         $quote->discounts()->delete();

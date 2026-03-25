@@ -32,7 +32,7 @@ class CheckForContract
                 str_starts_with($routeName, 'leads.') &&
                 $id
             ) {
-                $lead = Auth::user()->leads->where('rep', Auth::user()->user_id)->where('id', $id)->firstOrFail();
+                $lead = Auth::user()->scopedLeads()->where('id', $id)->firstOrFail();
 
                 if ($liveSigningDocument = Document::where('lead_id', $id)->whereNotIn('status', ['document.completed', 'document.abandoned'])->first()) {
                     return redirect()->route('leads.contract.generate', ['id' => $lead->id, 'uuid' => $liveSigningDocument->uuid]);

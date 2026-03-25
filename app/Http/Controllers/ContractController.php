@@ -23,7 +23,7 @@ class ContractController extends Controller
 {
     public function details(Request $request, EmailValidationService $mail, CRMService $crm, SigningService $signingService, $id)
     {
-        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+        $lead = Auth::user()->scopedLeads()->where('id', $id)->firstOrFail();
 
         if ($request->isMethod('put')) {
             // 1. Validation Logic
@@ -198,7 +198,7 @@ class ContractController extends Controller
 
     public function generate(Request $request, $id, $documentId)
     {
-        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+        $lead = Auth::user()->scopedLeads()->where('id', $id)->firstOrFail();
         $document = Document::where('lead_id', $id)
             ->where('uuid', $documentId)
             ->first();
@@ -216,7 +216,7 @@ class ContractController extends Controller
             ->where('uuid', $documentId)
             ->firstOrFail();
 
-        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+        $lead = Auth::user()->scopedLeads()->where('id', $id)->firstOrFail();
 
         // 2. Fetch the status from the service
         $response = $signingService->getDocumentStatus($document->document_id);
@@ -253,7 +253,7 @@ class ContractController extends Controller
             ->where('uuid', $documentId)
             ->firstOrFail();
 
-        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+        $lead = Auth::user()->scopedLeads()->where('id', $id)->firstOrFail();
         $signingUrl = route('external.signing', ['documentId' => $document->uuid]);
 
         if ($request->isMethod('POST')) {
@@ -297,7 +297,7 @@ class ContractController extends Controller
             ->where('uuid', $documentId)
             ->firstOrFail();
 
-        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+        $lead = Auth::user()->scopedLeads()->where('id', $id)->firstOrFail();
 
         if ($document->status == 'document.completed')
             abort(404);
@@ -323,7 +323,7 @@ class ContractController extends Controller
             ->where('uuid', $documentId)
             ->firstOrFail();
 
-        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+        $lead = Auth::user()->scopedLeads()->where('id', $id)->firstOrFail();
 
         return view('contract.sent-to-client', compact('lead'));
     }

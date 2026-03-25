@@ -13,7 +13,7 @@ class LeadController extends Controller
     public function view(Request $request, $id)
     {
         $liveSigningDocument = null;
-        $lead = Auth::user()->leads->where('id', $id)->firstOrFail();
+        $lead = Auth::user()->scopedLeads()->where('id', $id)->firstOrFail();
         $products = Product::where('enabled', 'Y')
             ->get();
 
