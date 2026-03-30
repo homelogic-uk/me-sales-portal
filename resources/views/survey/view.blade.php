@@ -139,6 +139,7 @@
                 <div id="step-{{ $stepIndex + 2 }}" class="step-content">
                     @foreach($chunk as $question)
                         <div class="question-container">
+                            {{-- Question Text --}}
                             <label class="block text-lg sm:text-xl font-bold text-gray-800 mb-2 leading-relaxed">
                                 <span class="text-blue-600 mr-2">{{ $stepIndex + 2 }}.</span> {{ $question->question_text }}
                             </label>
@@ -152,22 +153,29 @@
 
                             <input type="hidden" name="questions[{{ $question->id }}][question]" value="{{ $question->question_text }}">
 
-                            @if($question->question_type === 'radio')
+                            @if($question->question_type === 'radio' || $question->question_type === 'checkbox')
                                 <div class="space-y-3">
                                     @foreach($question->answers as $answer)
-                                        <label class="flex items-start p-4 border border-gray-200 bg-white rounded-xl hover:bg-blue-50 cursor-pointer transition-all has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                                            <input type="radio" name="questions[{{ $question->id }}][answer]" value="{{ $answer->answer_text }}" class="mt-1 h-4 w-4 text-blue-600" required {{ old("questions.{$question->id}.answer") == $answer->answer_text ? 'checked' : '' }}>
-                                            <span class="ml-3 text-sm text-gray-700 font-medium">{{ $answer->answer_text }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
+                                        <label class="flex flex-col p-4 border border-gray-200 bg-white rounded-xl hover:bg-blue-50 cursor-pointer transition-all has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                                            <div class="flex items-start">
+                                                <input type="{{ $question->question_type }}"
+                                                       name="questions[{{ $question->id }}][answer]{{ $question->question_type === 'checkbox' ? '[]' : '' }}"
+                                                       value="{{ $answer->answer_text }}"
+                                                       class="mt-1 h-4 w-4 text-blue-600 {{ $question->question_type === 'checkbox' ? 'rounded' : '' }}"
+                                                       {{ $question->question_type === 'radio' ? 'required' : '' }}
+                                                       {{ (is_array(old("questions.{$question->id}.answer")) && in_array($answer->answer_text, old("questions.{$question->id}.answer"))) || old("questions.{$question->id}.answer") == $answer->answer_text ? 'checked' : '' }}>
 
-                            @elseif($question->question_type === 'checkbox')
-                                <div class="space-y-3">
-                                    @foreach($question->answers as $answer)
-                                        <label class="flex items-start p-4 border border-gray-200 bg-white rounded-xl hover:bg-blue-50 cursor-pointer transition-all has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                                            <input type="checkbox" name="questions[{{ $question->id }}][answer][]" value="{{ $answer->answer_text }}" class="mt-1 h-4 w-4 text-blue-600 rounded" {{ is_array(old("questions.{$question->id}.answer")) && in_array($answer->answer_text, old("questions.{$question->id}.answer")) ? 'checked' : '' }}>
-                                            <span class="ml-3 text-sm text-gray-700 font-medium">{{ $answer->answer_text }}</span>
+                                                <div class="ml-3 flex flex-col">
+                                                    <span class="text-sm text-gray-700 font-bold">{{ $answer->answer_text }}</span>
+
+                                                    {{-- Answer Guidance --}}
+                                                    @if(!empty($answer->answer_guidance))
+                                                        <span class="mt-1 text-xs text-gray-500 leading-normal">
+                                                            {!! $answer->answer_guidance !!}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </label>
                                     @endforeach
                                 </div>
@@ -184,7 +192,7 @@
                                 <input type="text" name="questions[{{ $question->id }}][answer]" required value="{{ old("questions.{$question->id}.answer") }}" placeholder="Type your answer..." class="w-full rounded-xl border border-gray-300 px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm">
 
                             @elseif($question->question_type === 'textarea')
-                                <textarea name="questions[{{ $question->id }}][answer]" required rows="4" @if(!$question->question_placeholder) placeholder="Enter detailed response..." @else placeholder="{{ $question->question_placeholder }}." @endif class="w-full rounded-xl border border-gray-300 px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm">{{ old("questions.{$question->id}.answer") }}</textarea>
+                                <textarea name="questions[{{ $question->id }}][answer]" required rows="4" placeholder="Enter detailed response..." class="w-full rounded-xl border border-gray-300 px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm">{{ old("questions.{$question->id}.answer") }}</textarea>
                             @endif
                         </div>
                     @endforeach
@@ -268,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateStep() {
         const activeStep = document.querySelector('.step-content.active');
 
-        // Added textarea support to JavaScript validation
+        // Combined selector for text inputs, selects, and textareas
         const basicInputs = activeStep.querySelectorAll('input[required]:not([type="radio"]):not([type="checkbox"]), select[required], textarea[required]');
         for (let input of basicInputs) {
             if (!input.value.trim() || !input.checkValidity()) {
