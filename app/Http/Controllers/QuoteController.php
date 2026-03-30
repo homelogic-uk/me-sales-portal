@@ -29,11 +29,16 @@ class QuoteController extends Controller
         if (!$product)
             abort(404);
 
-        if (!in_array(Auth::user()->user_group, ['ROOT'])) {
-            $survey = Survey::where('lead_id', $id)->where('product_id', $product->id)->first();
+        if (!in_array(Auth::user()->user_group, ['ROOT']) && Auth::user()->user_id == $lead->rep) {
+            $survey = Survey::where('lead_id', $id)
+                ->where('product_id', $product->id)
+                ->first();
 
             if ($product->survey->count() && !$survey) {
-                return redirect()->route('leads.quote.survey.view', ['id' => $id, 'productId' => $product->id]);
+                return redirect()->route('leads.quote.survey.view', [
+                    'id' => $id,
+                    'productId' => $product->id
+                ]);
             }
         }
 

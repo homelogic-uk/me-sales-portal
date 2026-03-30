@@ -72,11 +72,26 @@
 
 <section class="max-w-3xl mx-auto py-8 px-4 sm:px-6">
 
+    {{-- Breadcrumb --}}
     <div class="mb-6 flex items-center justify-between">
         <a href="{{ url()->previous() }}" class="flex items-center text-sm text-gray-500 hover:text-gray-700 transition-colors">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             Back to Dashboard
         </a>
+    </div>
+
+    {{-- How to use this survey form --}}
+    <div class="mb-8 p-6 bg-blue-50 border border-blue-100 rounded-xl shadow-sm">
+        <h3 class="text-blue-900 font-bold mb-3 flex items-center text-base">
+            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            How to use this survey form
+        </h3>
+        <ul class="text-blue-800 text-sm space-y-2 ml-1">
+            <li class="flex items-start"><span class="mr-2">•</span> Read the question first.</li>
+            <li class="flex items-start"><span class="mr-2">•</span> Read the guidance underneath before choosing an answer.</li>
+            <li class="flex items-start"><span class="mr-2">•</span> Use the option descriptions to understand what each answer really means on-site.</li>
+            <li class="flex items-start font-semibold text-blue-900"><span class="mr-2">•</span> Do not guess any answers.</li>
+        </ul>
     </div>
 
     @if ($errors->any())
@@ -124,9 +139,16 @@
                 <div id="step-{{ $stepIndex + 2 }}" class="step-content">
                     @foreach($chunk as $question)
                         <div class="question-container">
-                            <label class="block text-lg sm:text-xl font-bold text-gray-800 mb-6 leading-relaxed">
+                            <label class="block text-lg sm:text-xl font-bold text-gray-800 mb-2 leading-relaxed">
                                 <span class="text-blue-600 mr-2">{{ $stepIndex + 2 }}.</span> {{ $question->question_text }}
                             </label>
+
+                            {{-- Question Guidance --}}
+                            @if(!empty($question->question_guidance))
+                                <div class="text-sm text-gray-600 mb-6 leading-relaxed bg-gray-50 p-4 rounded-xl border-l-4 border-blue-200">
+                                    {!! $question->question_guidance !!}
+                                </div>
+                            @endif
 
                             <input type="hidden" name="questions[{{ $question->id }}][question]" value="{{ $question->question_text }}">
 
@@ -160,6 +182,9 @@
 
                             @elseif($question->question_type === 'text')
                                 <input type="text" name="questions[{{ $question->id }}][answer]" required value="{{ old("questions.{$question->id}.answer") }}" placeholder="Type your answer..." class="w-full rounded-xl border border-gray-300 px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm">
+
+                            @elseif($question->question_type === 'textarea')
+                                <textarea name="questions[{{ $question->id }}][answer]" required rows="4" @if(!$question->question_placeholder) placeholder="Enter detailed response..." @else placeholder="{{ $question->question_placeholder }}." @endif class="w-full rounded-xl border border-gray-300 px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm">{{ old("questions.{$question->id}.answer") }}</textarea>
                             @endif
                         </div>
                     @endforeach
@@ -227,6 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const percentage = Math.round((currentStep / totalSteps) * 100);
         document.getElementById('progress-bar').style.width = `${percentage}%`;
         document.getElementById('step-counter').innerText = `${percentage}%`;
+        document.getElementById('step-description').innerText = `Step ${currentStep} of ${totalSteps}`;
         document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
 
         if (currentStep === totalSteps) {
@@ -242,8 +268,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateStep() {
         const activeStep = document.querySelector('.step-content.active');
 
-        // 1. Validate Text, Email, Selects
-        const basicInputs = activeStep.querySelectorAll('input[required]:not([type="radio"]):not([type="checkbox"]), select[required]');
+        // Added textarea support to JavaScript validation
+        const basicInputs = activeStep.querySelectorAll('input[required]:not([type="radio"]):not([type="checkbox"]), select[required], textarea[required]');
         for (let input of basicInputs) {
             if (!input.value.trim() || !input.checkValidity()) {
                 input.reportValidity();
@@ -252,7 +278,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // 2. Validate Radios
         const radios = activeStep.querySelectorAll('input[type="radio"][required]');
         if (radios.length > 0) {
             const name = radios[0].name;
@@ -263,7 +288,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // 3. Validate Checkboxes (At least one must be checked)
         const checkboxes = activeStep.querySelectorAll('input[type="checkbox"]');
         if (checkboxes.length > 0) {
             const oneChecked = Array.from(checkboxes).some(cb => cb.checked);
@@ -279,8 +303,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function triggerError(el) {
         const container = el.closest('.question-container');
-        container.classList.add('input-error');
-        setTimeout(() => container.classList.remove('input-error'), 600);
+        if (container) {
+            container.classList.add('input-error');
+            setTimeout(() => container.classList.remove('input-error'), 600);
+        }
     }
 
     document.getElementById('nextBtn').addEventListener('click', () => {
